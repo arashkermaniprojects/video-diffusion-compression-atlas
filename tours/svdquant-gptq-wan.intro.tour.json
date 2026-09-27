@@ -27,7 +27,7 @@
   {
    "target": "svdquant-gptq-wan-ifig-04",
    "title": "Where it sits",
-   "text": "Finally, the map. This paper closes the diffusion quantization group. It reuses two tools already met in the atlas, GPTQ and SVDQuant, and adds clipping ratios per timestep bin and per expert. Its missing speed-up points to the next group of papers, which is all about fast kernels. The guided tour, one button to the right, takes it from here."
+   "text": "Finally, the map. This paper closes the diffusion quantization group. It reuses two tools already met in the atlas, GPTQ and SVDQuant, and adds clipping ratios per timestep bin and per expert. Its missing speed-up points to the next group of papers, which is all about fast kernels. Next comes the guided tour."
   }
  ]
 }

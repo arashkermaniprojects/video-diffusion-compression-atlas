@@ -1,7 +1,33 @@
-{"paper":"vbench","kind":"intro","button":"Play intro","title":"Before reading VBench","stops":[
- {"target":"vbench-paper-01","title":"A ruler, not a model","text":"VBench is different from every other paper in the atlas. It does not build or shrink a model. It measures generated video, splitting the question of whether a clip is good into sixteen separate scores. Each score uses its own small set of prompts and its own pretrained judge network. Reading it takes three ideas: feature embeddings, optical flow, and rank correlation. Let's take them one at a time."},
- {"target":"vbench-ifig-01","title":"Frames as directions","text":"First, embeddings. A network like DINO or CLIP turns each frame into a long vector. If two frames show the same cat, their vectors point almost the same way, and the cosine of the angle between them is close to one. VBench's consistency scores are just averages of these cosines over the whole clip. CLIP can also embed a sentence, so the same trick checks whether a frame matches the prompt."},
- {"target":"vbench-ifig-02","title":"Measuring motion","text":"Second, optical flow. A network called RAFT looks at two neighbouring frames and draws an arrow for how far each pixel moved. Big arrows mean the clip is moving; almost none means it is frozen. This is important for compression. A broken model that outputs a still picture scores perfectly on consistency and flicker. That is why VBench also reports dynamic degree, the share of clips that actually move."},
- {"target":"vbench-ifig-03","title":"Agreeing with people","text":"Third, how do we trust these judges? People compare two videos on one quality at a time, and each model gets a win ratio. Spearman's rho then compares the ranking by humans with the ranking by VBench. One means the same order, zero means unrelated. In the glossary, also notice MUSIQ, which rates noise and blur. That is the score most likely to drop under quantization."},
- {"target":"vbench-ifig-04","title":"Where this paper sits","text":"Finally, the map. The first fifteen papers give the model, the quantization methods, and the speed-up tricks, ending with TeaCache. VBench closes the atlas by giving the ruler. The thesis generates the same prompts with the same seeds from full precision and from compressed LTX-2.3, and compares them dimension by dimension. The guided tour, one button to the right, takes it from here."}
-]}
+{
+ "paper": "vbench",
+ "kind": "intro",
+ "button": "Play intro",
+ "title": "Before reading VBench",
+ "stops": [
+  {
+   "target": "vbench-paper-01",
+   "title": "A ruler, not a model",
+   "text": "VBench is different from every other paper in the atlas. It does not build or shrink a model. It measures generated video, splitting the question of whether a clip is good into sixteen separate scores. Each score uses its own small set of prompts and its own pretrained judge network. Reading it takes three ideas: feature embeddings, optical flow, and rank correlation. Let's take them one at a time."
+  },
+  {
+   "target": "vbench-ifig-01",
+   "title": "Frames as directions",
+   "text": "First, embeddings. A network like DINO or CLIP turns each frame into a long vector. If two frames show the same cat, their vectors point almost the same way, and the cosine of the angle between them is close to one. VBench's consistency scores are just averages of these cosines over the whole clip. CLIP can also embed a sentence, so the same trick checks whether a frame matches the prompt."
+  },
+  {
+   "target": "vbench-ifig-02",
+   "title": "Measuring motion",
+   "text": "Second, optical flow. A network called RAFT looks at two neighbouring frames and draws an arrow for how far each pixel moved. Big arrows mean the clip is moving; almost none means it is frozen. This is important for compression. A broken model that outputs a still picture scores perfectly on consistency and flicker. That is why VBench also reports dynamic degree, the share of clips that actually move."
+  },
+  {
+   "target": "vbench-ifig-03",
+   "title": "Agreeing with people",
+   "text": "Third, how do we trust these judges? People compare two videos on one quality at a time, and each model gets a win ratio. Spearman's rho then compares the ranking by humans with the ranking by VBench. One means the same order, zero means unrelated. In the glossary, also notice MUSIQ, which rates noise and blur. That is the score most likely to drop under quantization."
+  },
+  {
+   "target": "vbench-ifig-04",
+   "title": "Where this paper sits",
+   "text": "Finally, the map. The first fifteen papers give the model, the quantization methods, and the speed-up tricks, ending with TeaCache. VBench closes the atlas by giving the ruler. The thesis generates the same prompts with the same seeds from full precision and from compressed LTX-2.3, and compares them dimension by dimension. Next comes the guided tour."
+  }
+ ]
+}

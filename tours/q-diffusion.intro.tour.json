@@ -27,7 +27,7 @@
   {
    "target": "q-diffusion-ifig-04",
    "title": "Where this paper sits",
-   "text": "Finally, where this fits. The three papers before it quantize language models, which have no denoising steps. Q-Diffusion is the first diffusion paper in the atlas, and it adds step-aware calibration and a split quantizer for skip connections. The next paper, PTQ4DiT, brings these ideas to diffusion transformers like LTX-2.3. The calibration recipe is the part the thesis reuses directly. The guided tour, one button to the right, takes it from here."
+   "text": "Finally, where this fits. The three papers before it quantize language models, which have no denoising steps. Q-Diffusion is the first diffusion paper in the atlas, and it adds step-aware calibration and a split quantizer for skip connections. The next paper, PTQ4DiT, brings these ideas to diffusion transformers like LTX-2.3. The calibration recipe is the part the thesis reuses directly. Next comes the guided tour."
   }
  ]
 }

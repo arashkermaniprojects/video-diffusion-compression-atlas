@@ -27,7 +27,7 @@
   {
    "target": "dvd-quant-ifig-04",
    "title": "Where this paper sits",
-   "text": "Finally, the map. ViDiT-Q gave us live activation scales for video, and SVDQuant reached four bit weights and activations on images. DVD-Quant goes one step further: four bits on video, with no calibration at all. For this project, its weight method is the part to watch, because it produces an ordinary int4 grid that OpenVINO can already run. After this comes QVGen, which adds training. The guided tour, one button to the right, takes it from here."
+   "text": "Finally, the map. ViDiT-Q gave us live activation scales for video, and SVDQuant reached four bit weights and activations on images. DVD-Quant goes one step further: four bits on video, with no calibration at all. For this project, its weight method is the part to watch, because it produces an ordinary int4 grid that OpenVINO can already run. After this comes QVGen, which adds training. Next comes the guided tour."
   }
  ]
 }

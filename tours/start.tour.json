@@ -6,57 +6,132 @@
   {
    "target": "start-paper-01",
    "title": "Welcome to the atlas",
-   "text": "Welcome. Before opening any of the sixteen papers, it helps to spend a few minutes on the ideas they all take for granted. The thesis has one clear goal: take LTX-2.3, a model that turns a text prompt into a video with a matching soundtrack, and make it smaller and faster on an Intel CPU and an Intel Arc GPU, while proving that the output still looks and sounds right. Every paper in this atlas solves one piece of that puzzle. This tour gives the map before the territory."
+   "text": "Welcome to this atlas of sixteen papers on compressing video diffusion models. The thesis behind it takes LTX-2.3, a model that turns a text prompt into a video with sound, and makes it smaller and faster on an Intel CPU and an Intel Arc GPU without breaking its output. Each paper tab has a short intro, a guided tour, and a written guide for every figure and equation. With auto-continue on, everything plays in order. This tab lays the foundation."
   },
   {
    "target": "start-fig-01",
-   "title": "The pipeline",
-   "text": "Here is the whole system in one picture. The prompt goes into Gemma-3, a 12 billion parameter text encoder, which runs only once. Then comes the heart of the model, the dual-stream diffusion transformer, with 19 billion parameters split between video and audio. It is called again and again, once or several times per denoising step. At the end, small decoders turn the result into frames and sound. Notice the cost strip at the bottom. The indigo transformer is both the biggest part and the most repeated one, so that is the first target."
+   "title": "The whole pipeline",
+   "text": "First, the whole system. The prompt goes into Gemma 3, a twelve billion parameter text encoder that runs only once. Then comes the dual-stream diffusion transformer, with nineteen billion parameters for video and audio, which runs again and again, once or several times per denoising step. At the end, small decoders turn the result into frames and sound. The transformer is both the largest part and the most repeated one, so it is the first target."
+  },
+  {
+   "target": "start-fig-02",
+   "title": "What smaller means",
+   "text": "So what do smaller and faster actually mean? Smaller means fewer bytes per weight. Memory is roughly the number of parameters times the bytes each one takes, so moving from sixteen-bit to four-bit weights shrinks the transformer about four times. Faster then follows in two ways: fewer bytes travel from memory at every step, or the number of steps goes down. Every setting in this project is measured on size, speed and quality together."
   },
   {
    "target": "start-fig-03",
    "title": "How diffusion works",
-   "text": "Why is the transformer called so often? Because diffusion builds a video by removing noise step by step. It starts from pure noise, and at each step the transformer predicts a small move toward a clean result. The gold axis is the timestep, which tells the model how noisy the current input is. On top of that, guidance runs the model with and without the prompt, so one step can cost two or three calls. Keep the timestep in mind. The same network sees very different inputs early and late, and that will matter for quantization."
+   "text": "Now to diffusion itself, and why the transformer runs so often. Diffusion builds a video by removing noise in many small steps. It starts from pure noise, and at each step the transformer looks at the noisy latent and the timestep, shown in gold, and predicts a move toward a clean result. The same network sees very different inputs early and late in the process. That is exactly why quantization papers for diffusion care about timesteps."
+  },
+  {
+   "target": "start-fig-04",
+   "title": "Working in latent space",
+   "text": "But the transformer never touches raw pixels. A variational autoencoder, or VAE, first squeezes the video into a compact latent, and diffusion runs only on that latent. So the transformer sees thousands of tokens instead of millions of pixels, and the decoder expands the final latent back into frames only once, at the end. LTX-2 adds a second, one-dimensional audio VAE that works the same way for the soundtrack. Generate small, decode big."
+  },
+  {
+   "target": "start-fig-05",
+   "title": "Guidance multiplies cost",
+   "text": "There is one more multiplier on cost. Classifier-free guidance runs the transformer twice, once with the prompt and once without, and pushes the result away from the prompt-free answer by a guidance scale. That is equation one just below, and it makes the video follow the text more closely. LTX-2 adds a third pass that drops the other modality. So a single denoising step can cost up to three full transformer calls."
+  },
+  {
+   "target": "start-fig-06",
+   "title": "Linear layers are GEMMs",
+   "text": "Now to transformers, in five minutes. The basic unit is the linear layer. Each token is a row of numbers, and multiplying all tokens by a weight matrix at once is a general matrix multiply, or GEMM. The weights hold the model's knowledge and never change. The activations change with every prompt and every step. Weight-only compression, the main track of the thesis, shrinks the weights and leaves the activations alone."
+  },
+  {
+   "target": "start-fig-07",
+   "title": "Attention grows quadratically",
+   "text": "Attention works differently. Each token makes a query, a key and a value, and comparing every query with every key gives a table of scores that grows with the number of tokens squared. Equation two below states it: attention cost grows with the square of the token count, while a linear layer grows only in proportion. A short LTX-Video clip already has about six thousand latent tokens. And since attention has no weights, weight compression does not shrink it."
   },
   {
    "target": "start-fig-08",
-   "title": "Inside a transformer block",
-   "text": "Now open up one block of the transformer. Tokens flow through self-attention, where they look at each other, cross-attention, where they look at the text, and a feed-forward network. The timestep enters through the gold path, called AdaLN, which scales and shifts the values inside every block. The important point here is simple. Almost every box here is built from linear layers, which are large matrix multiplies with fixed weights. Those weights are what the thesis compresses. Attention itself has no weights, so compression does not shrink it."
+   "title": "Inside a DiT block",
+   "text": "Put those pieces together and we get one diffusion transformer block, stacked many times. Tokens pass through self-attention, where they look at each other, cross-attention, where they look at the text and in LTX-2 also at the other stream, and a feed-forward network. Almost every box is built from linear layers. The timestep enters through the gold path, called AdaLN, which sets a scale, shift and gate in each block, so the same weights behave differently at each noise level."
+  },
+  {
+   "target": "start-fig-09",
+   "title": "Floats and integers",
+   "text": "Now to numbers, and quantization from zero. A floating-point number splits its bits into a sign, an exponent that sets how big it is, and a mantissa that sets how precise it is. So a float carries its own scale. An integer is just an evenly spaced level, so eight-bit and four-bit integers need an extra scale factor to stand for a real value. LTX-2.3 ships in B F sixteen, and the compressed weights become integers plus scales."
+  },
+  {
+   "target": "start-tbl-01",
+   "title": "Memory at each precision",
+   "text": "This table puts numbers on that. At thirty-two bits, the nineteen billion parameter transformer needs seventy-six gigabytes. At sixteen bits, as released, it needs thirty-eight. Eight-bit weights halve that to nineteen, and four-bit weights with one scale per group of one hundred twenty-eight bring it to about nine point eight gigabytes. The equations below give the quick estimate, parameters times bytes, then define the scale, the zero-point, and the quantize and dequantize steps we are about to see in action."
   },
   {
    "target": "start-fig-10",
-   "title": "Quantization basics",
-   "text": "So what does compressing weights mean? Quantization stores each number with fewer bits, for example 4 bits instead of 16, which gives only sixteen possible levels. A scale and a zero-point map those levels back to real values. In this worked example, 0.23 becomes level 8 and comes back as 0.2, a small rounding error. But the magenta value 1.3 lies outside the chosen range, gets clipped, and comes back as 0.9, a large error. That tension between a fine grid and a wide range runs through every quantization paper."
+   "title": "A worked INT4 example",
+   "text": "Here those equations are worked through. The weights span minus zero point six to zero point nine. With sixteen levels, the step is zero point one and the zero-point is six. The value zero point two three becomes level eight and comes back as zero point two, a small rounding error. But the magenta value one point three lies outside the range, is clipped, and returns as zero point nine. Stretching the range would make every step coarser instead."
+  },
+  {
+   "target": "start-fig-11",
+   "title": "Who shares a scale",
+   "text": "That trade-off leads to a design choice: how many numbers share one scale. The fewer numbers per scale, the tighter the fit and the smaller the error, but more scales must be stored. Weights are usually scaled per output channel for eight bits, or per group of sixty-four or one hundred twenty-eight inputs for four bits. Activations change at every step, so papers often scale them per token on the fly, shown in gold."
+  },
+  {
+   "target": "start-fig-12",
+   "title": "Reading WxAy names",
+   "text": "Papers name their schemes by the bits of weights and activations. W four A sixteen means four-bit weights and sixteen-bit activations. Weight-only schemes like that decompress the weights inside the kernel and compute in sixteen-bit, so they mainly save memory and memory traffic. Schemes such as W eight A eight or W four A four also quantize activations, which unlocks integer matrix units but exposes activation outliers. The core track of the thesis is weight-only."
   },
   {
    "target": "start-fig-13",
    "title": "The outlier problem",
-   "text": "And here is where it gets hard. In large transformers, a few channels carry values far bigger than all the others. If one scale has to cover those outliers, the step becomes huge, and the ordinary values collapse onto one or two levels. Most of the quantization papers in this atlas are really different answers to this one problem: use smaller groups, move the outliers into the weights, rotate them away, or keep them in higher precision. The main track of the thesis, weight-only compression, avoids the worst of it because activations stay in 16-bit."
+   "text": "And here is the central difficulty. In large transformers, a few channels carry values far bigger than all the rest, shown in magenta. If one scale has to cover them, the step becomes huge, and ordinary values collapse onto one or two levels. Most quantization papers in this atlas are, at heart, different answers to this problem: smaller groups, moving outliers into the weights, rotating them away, or keeping them in higher precision."
+  },
+  {
+   "target": "start-fig-14",
+   "title": "PTQ, QAT, mixed precision",
+   "text": "Three terms appear in almost every paper. Post-training quantization, or PTQ, needs only a trained model and a small calibration set, which for diffusion must cover many timesteps. Quantization-aware training, or QAT, retrains the model with rounding simulated, at a cost of days of GPU time. Mixed precision gives each layer its own bit width, keeping the few sensitive layers at higher precision. This project works in the post-training setting."
+  },
+  {
+   "target": "start-fig-15",
+   "title": "Compute is close, data far",
+   "text": "Now to hardware, and why speed is not just a count of operations. A CPU has a few powerful cores with wide vector units. A GPU has many simpler cores plus matrix units, and usually its own fast memory. Each level of the memory hierarchy is faster but smaller than the one below. A thirty-eight gigabyte model cannot sit in any cache, so every denoising step streams the weights in from main memory."
   },
   {
    "target": "start-fig-16",
-   "title": "Why memory speed matters",
-   "text": "Now, why would fewer bits make anything faster? This roofline picture explains it. Some operations do little arithmetic for each byte they load, so the chip spends its time waiting for memory. They are memory-bound, and shrinking the weights moves them up the slope. Other operations do so much arithmetic that the chip's compute is the limit, and smaller weights save memory but little time. Many papers report speed-ups from custom kernels on NVIDIA GPUs. On the Intel hardware used here, each layer has to be measured to see where it really sits."
+   "title": "The roofline idea",
+   "text": "The roofline picture shows what that means for speed. An operation that does little arithmetic per byte it loads is memory-bound: bandwidth caps its speed, and shrinking the bytes, for example with four-bit weights, moves it up the slope. An operation that does a lot of arithmetic per byte is compute-bound, and weight-only compression then saves memory but little time. Where LTX-2.3's layers sit on the Intel CPU and Arc GPU must be measured, not assumed."
+  },
+  {
+   "target": "start-fig-17",
+   "title": "Kernels and fusion",
+   "text": "How the work is packaged matters too. A kernel is one compiled routine that runs an operation on the chip. Running operations as separate kernels sends every intermediate result out to memory and back again. A fused kernel does several steps in one pass and keeps the data on the chip. FlashAttention is this idea applied to attention, and OpenVINO fuses many common patterns automatically when it compiles a model."
+  },
+  {
+   "target": "start-fig-18",
+   "title": "Speed belongs to hardware",
+   "text": "Which leads to an important warning. Many papers report speed-ups from custom CUDA kernels on NVIDIA GPUs, using Tensor Cores, the NVIDIA matrix units that run certain low-precision formats much faster. Intel Arc GPUs have matching engines called XMX. But if a format has no fast kernel in OpenVINO, a method's accuracy gains may still carry over while its speed-up does not. A reported speed-up always belongs to its hardware."
   },
   {
    "target": "start-fig-19",
    "title": "The software stack",
-   "text": "This is the path the project code takes. Optimum Intel exports the diffusers model from PyTorch into OpenVINO's intermediate representation, a graph file plus a weight file for each component. NNCF then compresses those weights to 8 or 4 bits, optionally with smarter methods like AWQ, scale estimation or GPTQ. OpenVINO compiles the result for the CPU or the Arc GPU and picks its own kernels. No custom kernel is ever written. And every configuration goes through the gold evaluation harness, which compares it with the PyTorch reference."
+   "text": "Now to the software stack this project uses: export, compress, compile, compare. Optimum Intel traces each part of the diffusers pipeline into OpenVINO's intermediate representation, a graph file plus a weight file. NNCF rewrites those weights as eight-bit or four-bit integers with scales. At load time, OpenVINO compiles the result for the CPU or GPU and picks its own kernels, so no custom kernel is written. Every setting is then compared with the PyTorch reference."
   },
   {
    "target": "start-fig-20",
    "title": "Measuring quality",
-   "text": "How can anyone tell the model was not broken? Papers use very different metrics, so it pays to learn to read them. Paired metrics, in the teal box, compare the compressed output with the full-precision output for the same prompt and seed. The WWB similarity used in this project is one of these, and it directly shows the damage. Unpaired metrics, like FID, CLIP score and VBench, judge realism, text match and video qualities on their own. The thesis plan uses both, WWB similarity plus a subset of VBench, always on a fixed prompt set with fixed seeds."
+   "text": "How can anyone tell the model was not broken? That is the job of quality metrics. Paired metrics compare the compressed output with the full-precision output for the same prompt and seed, so they directly measure damage. Unpaired metrics score realism, text match or video properties on their own, and are used to compare different models. The thesis plan combines both: WWB similarity from OpenVINO's GenAI tools for paired checks, and a subset of VBench for video qualities."
+  },
+  {
+   "target": "start-fig-21",
+   "title": "Speeding up without bits",
+   "text": "Quantization is not the only lever. There are four that stack. Quantization shortens each step. Step caching, as in DeepCache and TeaCache, reuses an earlier result when a cheap signal says the output barely changed. Distillation retrains the model to need fewer steps, which lies outside this project's scope. Efficient attention does the same math with less memory traffic. Caching needs no calibration and no custom kernels, which makes TeaCache the natural optional extra."
   },
   {
    "target": "start-fig-22",
    "title": "Map of the papers",
-   "text": "Here is the map of all sixteen papers in five columns. On the left, LTX-Video and LTX-2, the model family being compressed. Next, three language-model quantizers, GPTQ, SmoothQuant and AWQ, which NNCF already implements. Then seven papers that adapt those ideas to diffusion and video. Then three ways to speed up without fewer bits, including TeaCache for skipping steps. And finally VBench for judging video quality. The indigo boxes are the ones the thesis uses directly. The arrows show which ideas are reused by later papers."
+   "text": "Finally, the map of all sixteen papers. The language-model quantizers, GPTQ, SmoothQuant and AWQ, are the tools NNCF already implements. The diffusion papers adapt them to timesteps, video tokens and outliers. SmoothQuant-style scaling reappears in PTQ4DiT, ViDiT-Q and SVDQuant, and the Wan two point two paper combines SVDQuant with GPTQ. Indigo boxes are the papers the thesis uses directly, the others explain limits and alternatives, and the arrows mark only links the papers state."
   },
   {
    "target": "start-steps-01",
-   "title": "How to use the atlas",
-   "text": "Finally, how to use the atlas. For every paper, press Play intro first, a two-minute primer on what that paper assumes. Then press Play guided tour for its story in about five minutes. Whenever a figure or equation is puzzling, open its Guide note, and keep the glossary on this tab close by. Always end with the thesis box at the bottom of each tab, because it explains what to do with the paper in OpenVINO and NNCF. Next, open LTX-Video in the sidebar and press Play intro."
+   "title": "How the atlas works",
+   "text": "So how is the atlas meant to be used? Each paper tab opens with a two-minute intro on what that paper assumes, then a guided tour of its story in about five minutes, scrolling to each key figure. Every figure, equation and table has its own guide, a short spoken-style explanation. And every tab ends with a thesis box that says what the paper means in practice for OpenVINO and NNCF."
+  },
+  {
+   "target": "start-callout-01",
+   "title": "Glossary and wrap-up",
+   "text": "The glossary collects every term from this primer, from activation and AdaLN to calibration data and compute-bound, for quick lookup at any point. To sum up: the transformer is the bottleneck, diffusion calls it many times, weight quantization shrinks its linear layers, outliers make that hard, and speed depends on memory and on the kernels the hardware actually has. Next comes the first paper, LTX-Video."
   }
  ]
 }

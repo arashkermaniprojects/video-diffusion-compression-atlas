@@ -27,7 +27,7 @@
   {
    "target": "gptq-ifig-04",
    "title": "Where GPTQ sits",
-   "text": "Finally, the map. The previous tab covered LTX-2, the model this thesis compresses. GPTQ opens the quantization part of the atlas, shrinking weights only, and SmoothQuant comes next to handle activations. Most importantly for the thesis, NNCF's int4 weight compression can run GPTQ directly, so this paper explains a button the project actually presses. When ready, press Play guided tour."
+   "text": "Finally, the map. The previous tab covered LTX-2, the model this thesis compresses. GPTQ opens the quantization part of the atlas, shrinking weights only, and SmoothQuant comes next to handle activations. Most importantly for the thesis, NNCF's int4 weight compression can run GPTQ directly, so this paper explains a button the project actually presses. Next comes the guided tour."
   }
  ]
 }

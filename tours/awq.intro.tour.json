@@ -27,7 +27,7 @@
   {
    "target": "awq-ifig-04",
    "title": "Where AWQ sits",
-   "text": "Finally, the map. GPTQ fixed rounding errors with second-order math, and SmoothQuant moved outliers with a per-channel scale. AWQ borrows that scaling idea for four bit weights only, and adds fast kernels. After it, Q-Diffusion takes us into diffusion models and timesteps. So read AWQ as the method this project will actually run. The guided tour, one button to the right, takes it from here."
+   "text": "Finally, the map. GPTQ fixed rounding errors with second-order math, and SmoothQuant moved outliers with a per-channel scale. AWQ borrows that scaling idea for four bit weights only, and adds fast kernels. After it, Q-Diffusion takes us into diffusion models and timesteps. So read AWQ as the method this project will actually run. Next comes the guided tour."
   }
  ]
 }

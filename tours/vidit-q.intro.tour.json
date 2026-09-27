@@ -27,7 +27,7 @@
   {
    "target": "vidit-q-ifig-04",
    "title": "Where this paper sits",
-   "text": "Finally, where does this fit? Q-Diffusion and PTQ4DiT handled image models. ViDiT-Q is the first to tackle video transformers, and it adds three pieces: per token dynamic scales, a two step channel balancing, and a mixed precision search that judges each layer by the quality it actually affects. That last piece is what the thesis reuses with NNCF. The guided tour, one button to the right, takes it from here."
+   "text": "Finally, where does this fit? Q-Diffusion and PTQ4DiT handled image models. ViDiT-Q is the first to tackle video transformers, and it adds three pieces: per token dynamic scales, a two step channel balancing, and a mixed precision search that judges each layer by the quality it actually affects. That last piece is what the thesis reuses with NNCF. Next comes the guided tour."
   }
  ]
 }

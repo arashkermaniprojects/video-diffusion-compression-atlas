@@ -27,7 +27,7 @@
   {
    "target": "ptq4dit-ifig-04",
    "title": "Where it sits",
-   "text": "Finally, the map. Just before this came Q-Diffusion, which calibrated U-Nets across timesteps. PTQ4DiT takes the SmoothQuant idea of moving magnitude between activations and weights, and makes it work on diffusion transformers. Next comes ViDiT-Q, which faces video and needs stronger tools. The guided tour, one button to the right, takes it from here."
+   "text": "Finally, the map. Just before this came Q-Diffusion, which calibrated U-Nets across timesteps. PTQ4DiT takes the SmoothQuant idea of moving magnitude between activations and weights, and makes it work on diffusion transformers. Next comes ViDiT-Q, which faces video and needs stronger tools. Next comes the guided tour."
   }
  ]
 }

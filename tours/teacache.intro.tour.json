@@ -27,7 +27,7 @@
   {
    "target": "teacache-ifig-04",
    "title": "Where this paper sits",
-   "text": "Finally, where does this sit? The quantization papers made each pass cheaper. FlashAttention-2 and DeepCache sped things up inside a pass or inside a U-Net. TeaCache skips whole passes of a transformer, which is exactly the kind of model LTX-2.3 is. Because it is independent of int8 or int4 weights, the two can be combined on LTX-2.3. The guided tour, one button to the right, takes it from here."
+   "text": "Finally, where does this sit? The quantization papers made each pass cheaper. FlashAttention-2 and DeepCache sped things up inside a pass or inside a U-Net. TeaCache skips whole passes of a transformer, which is exactly the kind of model LTX-2.3 is. Because it is independent of int8 or int4 weights, the two can be combined on LTX-2.3. Next comes the guided tour."
   }
  ]
 }

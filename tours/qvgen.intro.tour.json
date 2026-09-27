@@ -27,7 +27,7 @@
   {
    "target": "qvgen-ifig-04",
    "title": "Where it sits",
-   "text": "On the map, QVGen follows SVDQuant and DVD-Quant. It borrows SVDQuant's low-rank branch, but uses it only during training, so the shipped model is plain W four A four with no extra cost. For the thesis, it serves as the floor: even with expensive training, four bits is about as low as video models go. The guided tour, one button to the right, takes it from here."
+   "text": "On the map, QVGen follows SVDQuant and DVD-Quant. It borrows SVDQuant's low-rank branch, but uses it only during training, so the shipped model is plain W four A four with no extra cost. For the thesis, it serves as the floor: even with expensive training, four bits is about as low as video models go. Next comes the guided tour."
   }
  ]
 }

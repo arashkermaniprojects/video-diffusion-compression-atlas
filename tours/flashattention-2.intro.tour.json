@@ -27,7 +27,7 @@
   {
    "target": "flashattention-2-ifig-04",
    "title": "Where this paper sits",
-   "text": "Here is where the paper fits. The ten papers before it made weights and activations smaller. But attention has no weights, so int4 compression in NNCF cannot speed it up, and in a video model with thousands of tokens attention can take a large share of each step. FlashAttention-2 fills that gap, with no calibration and no quality risk. After it, DeepCache and TeaCache save time by skipping repeated work across steps. The guided tour, one button to the right, takes it from here."
+   "text": "Here is where the paper fits. The ten papers before it made weights and activations smaller. But attention has no weights, so int4 compression in NNCF cannot speed it up, and in a video model with thousands of tokens attention can take a large share of each step. FlashAttention-2 fills that gap, with no calibration and no quality risk. After it, DeepCache and TeaCache save time by skipping repeated work across steps. Next comes the guided tour."
   }
  ]
 }

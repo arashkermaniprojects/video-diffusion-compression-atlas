@@ -1,7 +1,33 @@
-{"paper":"ltx-video","kind":"intro","button":"Play intro","title":"Before reading LTX-Video","stops":[
- {"target":"ltx-video-paper-01","title":"What this paper is","text":"This paper introduces LTX-Video, the ancestor of the model this thesis compresses. It makes five seconds of video in about two seconds on a big data centre GPU. Before opening it, three simple ideas are needed: how a video becomes tokens, why the number of tokens matters so much, and how diffusion turns noise into a video. Let's take them one at a time."},
- {"target":"ltx-video-ifig-01","title":"From pixels to tokens","text":"First, the model never works on pixels. An autoencoder, called a VAE, squeezes the video into a small grid. In LTX-Video, every block of thirty two by thirty two pixels over eight frames becomes one token of one hundred and twenty eight numbers. The transformer only sees this grid, and the decoder turns it back into a video at the end."},
- {"target":"ltx-video-ifig-02","title":"Why fewer tokens matter","text":"Second, attention compares every token with every other token, so its cost grows with the square of the token count. For a five second clip, a typical model has about forty seven thousand tokens. LTX-Video has about six thousand. That is almost eight times fewer tokens, and roughly sixty times less attention work. Keep this in mind whenever the paper talks about compression."},
- {"target":"ltx-video-ifig-03","title":"Diffusion in steps","text":"Third, diffusion. Generation starts from pure noise, and the diffusion transformer removes a little of it at each step, guided by the text and by the timestep, which is just the current noise level. Each arrow is one full pass through the network. LTX-Video lets the decoder do the very last step. In the glossary below, make sure latent, timestep and rectified flow feel familiar before reading on."},
- {"target":"ltx-video-ifig-04","title":"Where it sits","text":"Finally, the map. This paper builds the skeleton: the VAE, the diffusion transformer and the denoising decoder. The next paper, LTX-2, adds sound to it, and everything after that is about making such a model cheaper. When ready, press Play guided tour."}
-]}
+{
+ "paper": "ltx-video",
+ "kind": "intro",
+ "button": "Play intro",
+ "title": "Before reading LTX-Video",
+ "stops": [
+  {
+   "target": "ltx-video-paper-01",
+   "title": "What this paper is",
+   "text": "This paper introduces LTX-Video, the ancestor of the model this thesis compresses. It makes five seconds of video in about two seconds on a big data centre GPU. Before opening it, three simple ideas are needed: how a video becomes tokens, why the number of tokens matters so much, and how diffusion turns noise into a video. Let's take them one at a time."
+  },
+  {
+   "target": "ltx-video-ifig-01",
+   "title": "From pixels to tokens",
+   "text": "First, the model never works on pixels. An autoencoder, called a VAE, squeezes the video into a small grid. In LTX-Video, every block of thirty two by thirty two pixels over eight frames becomes one token of one hundred and twenty eight numbers. The transformer only sees this grid, and the decoder turns it back into a video at the end."
+  },
+  {
+   "target": "ltx-video-ifig-02",
+   "title": "Why fewer tokens matter",
+   "text": "Second, attention compares every token with every other token, so its cost grows with the square of the token count. For a five second clip, a typical model has about forty seven thousand tokens. LTX-Video has about six thousand. That is almost eight times fewer tokens, and roughly sixty times less attention work. Keep this in mind whenever the paper talks about compression."
+  },
+  {
+   "target": "ltx-video-ifig-03",
+   "title": "Diffusion in steps",
+   "text": "Third, diffusion. Generation starts from pure noise, and the diffusion transformer removes a little of it at each step, guided by the text and by the timestep, which is just the current noise level. Each arrow is one full pass through the network. LTX-Video lets the decoder do the very last step. In the glossary below, make sure latent, timestep and rectified flow feel familiar before reading on."
+  },
+  {
+   "target": "ltx-video-ifig-04",
+   "title": "Where it sits",
+   "text": "Finally, the map. This paper builds the skeleton: the VAE, the diffusion transformer and the denoising decoder. The next paper, LTX-2, adds sound to it, and everything after that is about making such a model cheaper. Next comes the guided tour."
+  }
+ ]
+}

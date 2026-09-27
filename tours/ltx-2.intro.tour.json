@@ -1,7 +1,33 @@
-{"paper":"ltx-2","kind":"intro","button":"Play intro","title":"Before reading LTX-2","stops":[
- {"target":"ltx-2-paper-01","title":"What this report is","text":"This report describes LTX-2, a model that makes a video and its soundtrack together from one text prompt. It matters because the thesis model, LTX-2.3, belongs to this family. The paper is short on equations and long on architecture, so what is needed first is vocabulary. Let's go through three ideas: latents, attention between streams, and guidance. Then the report reads as a map of weights and compute."},
- {"target":"ltx-2-ifig-01","title":"Latents and steps","text":"First, latents. The model never works on pixels or waveforms while it generates. A VAE compresses video into a small grid of tokens and sound into a row of tokens, about one every twenty-fifth of a second. Generation starts from pure noise, and the dual-stream transformer cleans it up over many steps while the noise level, sigma, falls from one to zero. Only at the end do the decoders produce frames and sound. Remember that the transformer is the part that repeats."},
- {"target":"ltx-2-ifig-03","title":"Why a step costs more","text":"Second, guidance, which multiplies that repetition. To follow the prompt closely, the model runs once with everything, once without the text, and once without the other stream, then mixes the three. So one step can mean three transformer passes. Keep this in mind when looking at the speed table: it was measured with guidance switched off, on a data-centre GPU."},
- {"target":"ltx-2-gloss-01","title":"Words to know","text":"A few terms from this list will come up constantly. The DiT, or diffusion transformer, is the denoiser. Cross-attention is how one stream reads the text or the other stream. AdaLN are small layers that inject the timestep into every block, and they are usually kept in high precision during quantization. And the H100 is the NVIDIA GPU behind the paper's timings, a very different machine from an Intel Arc card."},
- {"target":"ltx-2-ifig-04","title":"Where it sits","text":"Finally, where this paper sits. LTX-Video, the previous tab, gave the family its compressed latent space and fast transformer. LTX-2 adds audio, a Gemma-3 text encoder and guidance per modality. The next tab, GPTQ, starts the compression part of the atlas, and every paper after it is a tool for the blocks introduced here. When ready, press Play guided tour."}
-]}
+{
+ "paper": "ltx-2",
+ "kind": "intro",
+ "button": "Play intro",
+ "title": "Before reading LTX-2",
+ "stops": [
+  {
+   "target": "ltx-2-paper-01",
+   "title": "What this report is",
+   "text": "This report describes LTX-2, a model that makes a video and its soundtrack together from one text prompt. It matters because the thesis model, LTX-2.3, belongs to this family. The paper is short on equations and long on architecture, so what is needed first is vocabulary. Let's go through three ideas: latents, attention between streams, and guidance. Then the report reads as a map of weights and compute."
+  },
+  {
+   "target": "ltx-2-ifig-01",
+   "title": "Latents and steps",
+   "text": "First, latents. The model never works on pixels or waveforms while it generates. A VAE compresses video into a small grid of tokens and sound into a row of tokens, about one every twenty-fifth of a second. Generation starts from pure noise, and the dual-stream transformer cleans it up over many steps while the noise level, sigma, falls from one to zero. Only at the end do the decoders produce frames and sound. Remember that the transformer is the part that repeats."
+  },
+  {
+   "target": "ltx-2-ifig-03",
+   "title": "Why a step costs more",
+   "text": "Second, guidance, which multiplies that repetition. To follow the prompt closely, the model runs once with everything, once without the text, and once without the other stream, then mixes the three. So one step can mean three transformer passes. Keep this in mind when looking at the speed table: it was measured with guidance switched off, on a data-centre GPU."
+  },
+  {
+   "target": "ltx-2-gloss-01",
+   "title": "Words to know",
+   "text": "A few terms from this list will come up constantly. The DiT, or diffusion transformer, is the denoiser. Cross-attention is how one stream reads the text or the other stream. AdaLN are small layers that inject the timestep into every block, and they are usually kept in high precision during quantization. And the H100 is the NVIDIA GPU behind the paper's timings, a very different machine from an Intel Arc card."
+  },
+  {
+   "target": "ltx-2-ifig-04",
+   "title": "Where it sits",
+   "text": "Finally, where this paper sits. LTX-Video, the previous tab, gave the family its compressed latent space and fast transformer. LTX-2 adds audio, a Gemma-3 text encoder and guidance per modality. The next tab, GPTQ, starts the compression part of the atlas, and every paper after it is a tool for the blocks introduced here. Next comes the guided tour."
+  }
+ ]
+}

@@ -27,7 +27,7 @@
   {
    "target": "smoothquant-ifig-04",
    "title": "Where it sits",
-   "text": "Finally, the map. GPTQ came just before and handled weights only. SmoothQuant adds the activation side by moving the outlier scale from the activations into the weights. AWQ, next, reuses the same scaling idea for four-bit weights, and later diffusion papers borrow it too. When ready, press Play guided tour."
+   "text": "Finally, the map. GPTQ came just before and handled weights only. SmoothQuant adds the activation side by moving the outlier scale from the activations into the weights. AWQ, next, reuses the same scaling idea for four-bit weights, and later diffusion papers borrow it too. Next comes the guided tour."
   }
  ]
 }

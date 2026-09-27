@@ -1,12 +1,33 @@
-{"paper":"svdquant","kind":"intro","button":"Play intro","title":"Before reading SVDQuant","stops":[
- {"target":"svdquant-paper-01","title":"What is needed first",
-  "text":"Before we start SVDQuant, a little groundwork. This paper squeezes a big image diffusion transformer, FLUX.1, down to four bit weights and four bit activations, and still gets images close to the original. Its trick is to give the outliers a small high-precision side path instead of rounding them. Following it takes three things: what a singular value decomposition does, why four bit activations matter, and why a small extra branch can still be slow."},
- {"target":"svdquant-ifig-01","title":"SVD from zero",
-  "text":"Start with the linear algebra. Any weight matrix can be written as a stack of simple layers, each with a size called a singular value, sorted from biggest to smallest. Keeping the few biggest gives two thin matrices that capture most of the matrix. Whatever is left is a small, flat residual. SVDQuant keeps the thin part in sixteen bits and rounds only the residual to four bits."},
- {"target":"svdquant-ifig-02","title":"Why both must be four bit",
-  "text":"Next, the notation. W four A four means four bit weights and four bit activations. Weight-only formats like NF4 make the file smaller, but the weights are unpacked and multiplied in sixteen bits, so nothing gets faster. Diffusion models spend their time on arithmetic, not on loading weights, so the authors need both sides in four bits. Just remember that Intel hardware does not multiply four bit activations, so for this project it is about quality, not speed."},
- {"target":"svdquant-gloss-01","title":"Words to know",
-  "text":"A few words from the glossary will come up constantly. Smoothing is the SmoothQuant trick that moves activation outliers into the weights. Rank is how many independent directions a matrix really uses. Nunchaku is the authors' own engine that fuses the side branch into the four bit kernels. And LPIPS measures how close a quantized image is to the original, where lower is better."},
- {"target":"svdquant-ifig-04","title":"Where it sits",
-  "text":"Finally, where this paper fits. It follows ViDiT-Q, which broke at four bits. It reuses two tools met earlier in the atlas, smoothing from SmoothQuant and GPTQ for the leftover weights, and adds the low-rank branch. Later in the atlas, a paper applies the same recipe to the Wan video model. The guided tour, one button to the right, takes it from here."}
-]}
+{
+ "paper": "svdquant",
+ "kind": "intro",
+ "button": "Play intro",
+ "title": "Before reading SVDQuant",
+ "stops": [
+  {
+   "target": "svdquant-paper-01",
+   "title": "What is needed first",
+   "text": "Before we start SVDQuant, a little groundwork. This paper squeezes a big image diffusion transformer, FLUX.1, down to four bit weights and four bit activations, and still gets images close to the original. Its trick is to give the outliers a small high-precision side path instead of rounding them. Following it takes three things: what a singular value decomposition does, why four bit activations matter, and why a small extra branch can still be slow."
+  },
+  {
+   "target": "svdquant-ifig-01",
+   "title": "SVD from zero",
+   "text": "Start with the linear algebra. Any weight matrix can be written as a stack of simple layers, each with a size called a singular value, sorted from biggest to smallest. Keeping the few biggest gives two thin matrices that capture most of the matrix. Whatever is left is a small, flat residual. SVDQuant keeps the thin part in sixteen bits and rounds only the residual to four bits."
+  },
+  {
+   "target": "svdquant-ifig-02",
+   "title": "Why both must be four bit",
+   "text": "Next, the notation. W four A four means four bit weights and four bit activations. Weight-only formats like NF4 make the file smaller, but the weights are unpacked and multiplied in sixteen bits, so nothing gets faster. Diffusion models spend their time on arithmetic, not on loading weights, so the authors need both sides in four bits. Just remember that Intel hardware does not multiply four bit activations, so for this project it is about quality, not speed."
+  },
+  {
+   "target": "svdquant-gloss-01",
+   "title": "Words to know",
+   "text": "A few words from the glossary will come up constantly. Smoothing is the SmoothQuant trick that moves activation outliers into the weights. Rank is how many independent directions a matrix really uses. Nunchaku is the authors' own engine that fuses the side branch into the four bit kernels. And LPIPS measures how close a quantized image is to the original, where lower is better."
+  },
+  {
+   "target": "svdquant-ifig-04",
+   "title": "Where it sits",
+   "text": "Finally, where this paper fits. It follows ViDiT-Q, which broke at four bits. It reuses two tools met earlier in the atlas, smoothing from SmoothQuant and GPTQ for the leftover weights, and adds the low-rank branch. Later in the atlas, a paper applies the same recipe to the Wan video model. Next comes the guided tour."
+  }
+ ]
+}
