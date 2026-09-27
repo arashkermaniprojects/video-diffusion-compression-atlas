@@ -1,0 +1,33 @@
+{
+ "paper": "qvgen",
+ "kind": "intro",
+ "button": "Play intro",
+ "title": "Before reading QVGen",
+ "stops": [
+  {
+   "target": "qvgen-paper-01",
+   "title": "A different kind of paper",
+   "text": "QVGen asks how far a video diffusion transformer can shrink if one is willing to retrain it: four bits, or even three, for both weights and activations. Until now, every quantization paper in the atlas took a finished model and rounded it without changing the weights. This one keeps training while it rounds. So reading it first takes three ideas: training versus post-training quantization, how gradients pass through rounding, and what a low-rank matrix is."
+  },
+  {
+   "target": "qvgen-ifig-01",
+   "title": "Training versus rounding",
+   "text": "Look at the two rows. Post-training quantization freezes the weights and only picks scales from a handful of samples, so it takes hours. Quantization-aware training simulates the rounding in every forward pass, which we call fake quantization, and lets gradient descent adjust the weights to live with the error. The quality is better at very low bits, but the price is real training on many GPUs."
+  },
+  {
+   "target": "qvgen-ifig-02",
+   "title": "Gradients through a staircase",
+   "text": "Here is the catch. Rounding is a staircase, and its slope is zero almost everywhere, so normal backpropagation learns nothing. The straight-through estimator simply pretends the slope is one inside the clipping range and zero outside. It works, but it is noisy, and the paper argues that large, spiky gradient norms are exactly what hurts low-bit video training."
+  },
+  {
+   "target": "qvgen-ifig-03",
+   "title": "Low rank in one picture",
+   "text": "Their fix uses a low-rank helper. A big matrix can be approximated by a tall thin matrix times a short wide one, and singular value decomposition shows which pieces matter most. QVGen starts the helper as the rounding error at rank thirty-two, then halves the rank again and again until it disappears. In the glossary, also note knowledge distillation and the VBench benchmark."
+  },
+  {
+   "target": "qvgen-ifig-04",
+   "title": "Where it sits",
+   "text": "On the map, QVGen follows SVDQuant and DVD-Quant. It borrows SVDQuant's low-rank branch, but uses it only during training, so the shipped model is plain W four A four with no extra cost. For the thesis, it serves as the floor: even with expensive training, four bits is about as low as video models go. The guided tour, one button to the right, takes it from here."
+  }
+ ]
+}

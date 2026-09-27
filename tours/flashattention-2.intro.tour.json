@@ -1,0 +1,33 @@
+{
+ "paper": "flashattention-2",
+ "kind": "intro",
+ "button": "Play intro",
+ "title": "Before reading FlashAttention-2",
+ "stops": [
+  {
+   "target": "flashattention-2-paper-01",
+   "title": "A different kind of speed-up",
+   "text": "This paper is the odd one out so far. It does not compress anything. FlashAttention-2 makes attention faster by changing how data moves inside a GPU, and the answer it computes is exactly the same. Following it takes three small pieces of background: what attention computes, how softmax works, and what a GPU looks like from the inside. Let's take them one at a time."
+  },
+  {
+   "target": "flashattention-2-ifig-01",
+   "title": "Attention and softmax",
+   "text": "Attention is two matrix multiplies with a softmax in the middle. Every token is compared with every other token, which gives a score matrix with one entry per pair. Double the tokens and that matrix becomes four times bigger. Softmax then turns each row into weights that add up to one. The key trick, shown in the next picture, is that softmax can be computed block by block with a running maximum, without ever holding the full row."
+  },
+  {
+   "target": "flashattention-2-ifig-03",
+   "title": "Inside a GPU",
+   "text": "Now the hardware. A GPU has many small processors called streaming multiprocessors, or SMs. Each one has a little fast memory called SRAM, and they all share a big but slow memory called HBM. Work is organised as threads, grouped thirty two at a time into warps, and warps grouped into thread blocks, one block per SM. The whole paper is about keeping data in SRAM and keeping every SM busy."
+  },
+  {
+   "target": "flashattention-2-gloss-01",
+   "title": "Words to keep in mind",
+   "text": "The glossary collects the rest. Two terms matter most. Tensor Cores are the units that make matrix multiplies fast, so every exponential and division costs far more by comparison. And the forward pass is all that matters here, since the thesis runs inference, not training. So the backward pass sections can be skipped."
+  },
+  {
+   "target": "flashattention-2-ifig-04",
+   "title": "Where this paper sits",
+   "text": "Here is where the paper fits. The ten papers before it made weights and activations smaller. But attention has no weights, so int4 compression in NNCF cannot speed it up, and in a video model with thousands of tokens attention can take a large share of each step. FlashAttention-2 fills that gap, with no calibration and no quality risk. After it, DeepCache and TeaCache save time by skipping repeated work across steps. The guided tour, one button to the right, takes it from here."
+  }
+ ]
+}

@@ -1,0 +1,33 @@
+{
+ "paper": "dvd-quant",
+ "kind": "intro",
+ "button": "Play intro",
+ "title": "Before reading DVD-Quant",
+ "stops": [
+  {
+   "target": "dvd-quant-paper-01",
+   "title": "What is needed first",
+   "text": "Before we open DVD-Quant, let's get three ideas in place. This paper quantizes a big video diffusion transformer to four bit weights, and even four bit activations, without any calibration data at all. Seeing why that is special requires knowing what calibration is, what a four bit grid looks like, and how a rotation can tame outliers. Two minutes, and then the paper will read easily."
+  },
+  {
+   "target": "dvd-quant-ifig-01",
+   "title": "Weights sit still, activations move",
+   "text": "Every quantizer needs a scale for each tensor. Weights never change, so their grid can be worked out once from the weights themselves. Activations are different: they change with the prompt and with every denoising step. The usual answer is calibration: run sample prompts, record the ranges and freeze one scale. Look at the dashed line: it clips the tall steps and wastes levels on the short ones. DVD-Quant simply measures the scale live, at every step."
+  },
+  {
+   "target": "dvd-quant-ifig-02",
+   "title": "Grids and rotations",
+   "text": "Now the grid itself. Four bits give sixteen evenly spaced levels. Two numbers define them: the step size, which is the gap between levels, and the zero-point, which says where zero sits. Weights are bell shaped, so stretching the grid to the rare extremes wastes levels. Clipping the tails packs them where the weights really are. Next to it, the rotation picture: multiplying by a Hadamard matrix spreads one huge spike over all channels, and the layer output does not change."
+  },
+  {
+   "target": "dvd-quant-gloss-01",
+   "title": "Words to listen for",
+   "text": "A few terms from this list will come up again and again. Post-training quantization means shrinking a trained model without retraining it. W four A four means four bit weights and four bit activations, and W four A six in this paper is a step by step mix of four and eight bits. And keep in mind the hardware: every speed number comes from an NVIDIA RTX 4090 gaming card with custom kernels, not from Intel."
+  },
+  {
+   "target": "dvd-quant-ifig-04",
+   "title": "Where this paper sits",
+   "text": "Finally, the map. ViDiT-Q gave us live activation scales for video, and SVDQuant reached four bit weights and activations on images. DVD-Quant goes one step further: four bits on video, with no calibration at all. For this project, its weight method is the part to watch, because it produces an ordinary int4 grid that OpenVINO can already run. After this comes QVGen, which adds training. The guided tour, one button to the right, takes it from here."
+  }
+ ]
+}

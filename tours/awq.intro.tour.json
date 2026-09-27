@@ -1,0 +1,33 @@
+{
+ "paper": "awq",
+ "kind": "intro",
+ "button": "Play intro",
+ "title": "Before reading AWQ",
+ "stops": [
+  {
+   "target": "awq-paper-01",
+   "title": "What this paper is about",
+   "text": "Before we open AWQ, let's set the scene. The paper asks how to store a language model's weights in four bits without retraining and without losing accuracy. Its answer is surprisingly simple: protect the few weights that meet large inputs. This matters directly for the thesis, because NNCF offers AWQ as an option when it compresses weights to INT4. To follow the paper, three ideas come first, so let's go through them."
+  },
+  {
+   "target": "awq-ifig-01",
+   "title": "Four bit weights, sixteen bit inputs",
+   "text": "First, the format. W four A sixteen means the weights are stored in four bits while the activations stay in sixteen bit floating point. Weights are cut into groups of one hundred twenty eight, and each group shares one step size. Every weight becomes one of sixteen levels, and at run time it is expanded back to FP16 before the multiply. Plain rounding to the nearest level is called RTN, and it is the baseline that appears everywhere in the tables."
+  },
+  {
+   "target": "awq-ifig-02",
+   "title": "Channels that matter",
+   "text": "Second, channels. Each entry of the input vector multiplies one row of weights. Rounding gives all weights a similar small error, but that error gets multiplied by the input it meets. A few channels carry large inputs on nearly every token, so their weights matter most. The paper calls them salient and finds them by averaging activation sizes over a small calibration set, a handful of text samples from a public dataset called the Pile."
+  },
+  {
+   "target": "awq-ifig-03",
+   "title": "Why smaller means faster",
+   "text": "Third, speed. When a chatbot writes one token at a time, it must read every weight for very little arithmetic, so the chip mostly waits on memory. Four times smaller weights mean far less waiting. Keep one caveat in mind: a diffusion transformer step processes thousands of tokens at once, so for LTX-2.3 the main win is memory, not this kind of speed-up. In the tables, accuracy is mostly perplexity on WikiText-2, and lower is better."
+  },
+  {
+   "target": "awq-ifig-04",
+   "title": "Where AWQ sits",
+   "text": "Finally, the map. GPTQ fixed rounding errors with second-order math, and SmoothQuant moved outliers with a per-channel scale. AWQ borrows that scaling idea for four bit weights only, and adds fast kernels. After it, Q-Diffusion takes us into diffusion models and timesteps. So read AWQ as the method this project will actually run. The guided tour, one button to the right, takes it from here."
+  }
+ ]
+}

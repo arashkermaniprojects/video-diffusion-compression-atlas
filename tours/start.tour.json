@@ -1,0 +1,62 @@
+{
+ "paper": "start",
+ "button": "Play introduction",
+ "title": "Start here",
+ "stops": [
+  {
+   "target": "start-paper-01",
+   "title": "Welcome to the atlas",
+   "text": "Welcome. Before opening any of the sixteen papers, it helps to spend a few minutes on the ideas they all take for granted. The thesis has one clear goal: take LTX-2.3, a model that turns a text prompt into a video with a matching soundtrack, and make it smaller and faster on an Intel CPU and an Intel Arc GPU, while proving that the output still looks and sounds right. Every paper in this atlas solves one piece of that puzzle. This tour gives the map before the territory."
+  },
+  {
+   "target": "start-fig-01",
+   "title": "The pipeline",
+   "text": "Here is the whole system in one picture. The prompt goes into Gemma-3, a 12 billion parameter text encoder, which runs only once. Then comes the heart of the model, the dual-stream diffusion transformer, with 19 billion parameters split between video and audio. It is called again and again, once or several times per denoising step. At the end, small decoders turn the result into frames and sound. Notice the cost strip at the bottom. The indigo transformer is both the biggest part and the most repeated one, so that is the first target."
+  },
+  {
+   "target": "start-fig-03",
+   "title": "How diffusion works",
+   "text": "Why is the transformer called so often? Because diffusion builds a video by removing noise step by step. It starts from pure noise, and at each step the transformer predicts a small move toward a clean result. The gold axis is the timestep, which tells the model how noisy the current input is. On top of that, guidance runs the model with and without the prompt, so one step can cost two or three calls. Keep the timestep in mind. The same network sees very different inputs early and late, and that will matter for quantization."
+  },
+  {
+   "target": "start-fig-08",
+   "title": "Inside a transformer block",
+   "text": "Now open up one block of the transformer. Tokens flow through self-attention, where they look at each other, cross-attention, where they look at the text, and a feed-forward network. The timestep enters through the gold path, called AdaLN, which scales and shifts the values inside every block. The important point here is simple. Almost every box here is built from linear layers, which are large matrix multiplies with fixed weights. Those weights are what the thesis compresses. Attention itself has no weights, so compression does not shrink it."
+  },
+  {
+   "target": "start-fig-10",
+   "title": "Quantization basics",
+   "text": "So what does compressing weights mean? Quantization stores each number with fewer bits, for example 4 bits instead of 16, which gives only sixteen possible levels. A scale and a zero-point map those levels back to real values. In this worked example, 0.23 becomes level 8 and comes back as 0.2, a small rounding error. But the magenta value 1.3 lies outside the chosen range, gets clipped, and comes back as 0.9, a large error. That tension between a fine grid and a wide range runs through every quantization paper."
+  },
+  {
+   "target": "start-fig-13",
+   "title": "The outlier problem",
+   "text": "And here is where it gets hard. In large transformers, a few channels carry values far bigger than all the others. If one scale has to cover those outliers, the step becomes huge, and the ordinary values collapse onto one or two levels. Most of the quantization papers in this atlas are really different answers to this one problem: use smaller groups, move the outliers into the weights, rotate them away, or keep them in higher precision. The main track of the thesis, weight-only compression, avoids the worst of it because activations stay in 16-bit."
+  },
+  {
+   "target": "start-fig-16",
+   "title": "Why memory speed matters",
+   "text": "Now, why would fewer bits make anything faster? This roofline picture explains it. Some operations do little arithmetic for each byte they load, so the chip spends its time waiting for memory. They are memory-bound, and shrinking the weights moves them up the slope. Other operations do so much arithmetic that the chip's compute is the limit, and smaller weights save memory but little time. Many papers report speed-ups from custom kernels on NVIDIA GPUs. On the Intel hardware used here, each layer has to be measured to see where it really sits."
+  },
+  {
+   "target": "start-fig-19",
+   "title": "The software stack",
+   "text": "This is the path the project code takes. Optimum Intel exports the diffusers model from PyTorch into OpenVINO's intermediate representation, a graph file plus a weight file for each component. NNCF then compresses those weights to 8 or 4 bits, optionally with smarter methods like AWQ, scale estimation or GPTQ. OpenVINO compiles the result for the CPU or the Arc GPU and picks its own kernels. No custom kernel is ever written. And every configuration goes through the gold evaluation harness, which compares it with the PyTorch reference."
+  },
+  {
+   "target": "start-fig-20",
+   "title": "Measuring quality",
+   "text": "How can anyone tell the model was not broken? Papers use very different metrics, so it pays to learn to read them. Paired metrics, in the teal box, compare the compressed output with the full-precision output for the same prompt and seed. The WWB similarity used in this project is one of these, and it directly shows the damage. Unpaired metrics, like FID, CLIP score and VBench, judge realism, text match and video qualities on their own. The thesis plan uses both, WWB similarity plus a subset of VBench, always on a fixed prompt set with fixed seeds."
+  },
+  {
+   "target": "start-fig-22",
+   "title": "Map of the papers",
+   "text": "Here is the map of all sixteen papers in five columns. On the left, LTX-Video and LTX-2, the model family being compressed. Next, three language-model quantizers, GPTQ, SmoothQuant and AWQ, which NNCF already implements. Then seven papers that adapt those ideas to diffusion and video. Then three ways to speed up without fewer bits, including TeaCache for skipping steps. And finally VBench for judging video quality. The indigo boxes are the ones the thesis uses directly. The arrows show which ideas are reused by later papers."
+  },
+  {
+   "target": "start-steps-01",
+   "title": "How to use the atlas",
+   "text": "Finally, how to use the atlas. For every paper, press Play intro first, a two-minute primer on what that paper assumes. Then press Play guided tour for its story in about five minutes. Whenever a figure or equation is puzzling, open its Guide note, and keep the glossary on this tab close by. Always end with the thesis box at the bottom of each tab, because it explains what to do with the paper in OpenVINO and NNCF. Next, open LTX-Video in the sidebar and press Play intro."
+  }
+ ]
+}

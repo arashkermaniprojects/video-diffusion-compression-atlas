@@ -1,0 +1,33 @@
+{
+ "paper": "smoothquant",
+ "kind": "intro",
+ "button": "Play intro",
+ "title": "Before reading SmoothQuant",
+ "stops": [
+  {
+   "target": "smoothquant-paper-01",
+   "title": "What is needed first",
+   "text": "Before opening SmoothQuant, it helps to gather the tools to read it. The paper is about one question: how to run both the weights and the activations of a big transformer in eight-bit integers without losing accuracy. It assumes the reader already knows how rounding to integers works, what activations are, and why a few huge values cause trouble. So let's build those three ideas first, one picture at a time."
+  },
+  {
+   "target": "smoothquant-ifig-01",
+   "title": "One step size for many numbers",
+   "text": "Think of eight-bit quantization as a ruler with two hundred fifty six ticks. The spacing is set by the largest value that needs to be covered. On the top line nothing is unusual, so the ticks are fine. On the bottom line a single outlier at sixty stretches the ruler, and every normal value collapses onto a few ticks. That is the whole problem this paper attacks."
+  },
+  {
+   "target": "smoothquant-ifig-02",
+   "title": "Weights only, or activations too",
+   "text": "Now the second idea. GPTQ, and the NNCF weight compression the thesis uses first, shrink only the weights and turn them back into sixteen-bit floats before multiplying. That saves memory. W eight A eight goes further and rounds the activations too, so the multiply runs on integer hardware. Activations are computed live for every input, and that is where the outliers show up."
+  },
+  {
+   "target": "smoothquant-gloss-01",
+   "title": "Words to keep in mind",
+   "text": "A few terms will come up again and again. An outlier channel is one feature column that is far larger than the rest, and it stays the same channel across tokens. Static scales are fixed once from calibration data, while dynamic scales are measured on the fly. And A100 and FasterTransformer are simply the NVIDIA GPU and library where the speed tests were run."
+  },
+  {
+   "target": "smoothquant-ifig-04",
+   "title": "Where it sits",
+   "text": "Finally, the map. GPTQ came just before and handled weights only. SmoothQuant adds the activation side by moving the outlier scale from the activations into the weights. AWQ, next, reuses the same scaling idea for four-bit weights, and later diffusion papers borrow it too. When ready, press Play guided tour."
+  }
+ ]
+}

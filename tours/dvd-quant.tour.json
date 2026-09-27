@@ -1,0 +1,22 @@
+{
+ "paper": "dvd-quant",
+ "title": "DVD-Quant in five minutes",
+ "stops": [
+  {"target": "dvd-quant-paper-01", "title": "The question",
+   "text": "DVD-Quant asks a bold question. Can a video diffusion transformer be quantized to four bit weights and low bit activations without any calibration data at all? On HunyuanVideo the answer is yes. At W four A four, meaning four bit weights and four bit activations, it runs 2.12 times faster on a gaming GPU and needs 3.68 times less memory. For the LTX-2.3 study this matters a lot, because every calibration sample of LTX-2.3 costs real CPU time."},
+  {"target": "dvd-quant-fig-01", "title": "Replace data with maths",
+   "text": "Here is the whole idea in one picture. The usual recipe, on top, runs the model on calibration prompts across all fifty timesteps and freezes one set of scales. DVD-Quant, below, throws that pass away. Weight grids are computed offline from the weights alone. Activation scales are computed live from each step's own tensor. And a small switch decides, step by step, whether activations get four or eight bits. Those are the three boxes we will open."},
+  {"target": "dvd-quant-fig-03", "title": "Why static scales fail",
+   "text": "Why bother? Look at this curve. It is the largest activation value across the fifty denoising steps, and the flat line is one scale fixed from calibration. Where the curve rises above the line, values get clipped. Where it falls below, quantization levels sit unused. The shape is only illustrative, but the lesson is real: in video diffusion, activation ranges drift with the timestep, so any single frozen scale is wrong most of the time."},
+  {"target": "dvd-quant-fig-04", "title": "Part one: a better weight grid",
+   "text": "The weights have their own problem. They are bell shaped, but plain min max rounding stretches the sixteen four bit levels out to a few extreme values, so the dense centre gets too few levels. The first part, called BGR, fixes this with two loops. The outer loop tries tighter clipping bounds. The inner loop alternates simple closed form updates of the step size, the zero point and the rounded weights. The grid with the lowest error wins. No gradients, no data."},
+  {"target": "dvd-quant-fig-05", "title": "Part two: rotate, then scale live",
+   "text": "The second part, called ARQ, handles activations. First, both activations and weights are multiplied by a Hadamard matrix. The layer output stays the same, but a few huge outliers get spread across all channels. Rotation alone is not enough, though, because it can raise whole bands of channels. So ARQ then takes a scale per channel from the current step's rotated tensor. Notice that nothing here comes from a calibration set. It is all measured on the fly."},
+  {"target": "dvd-quant-fig-06", "title": "Part three: bits per step",
+   "text": "The third part, called delta G B S, spends eight bits only when they matter. It adds up how much the model output has changed since the last reset. When that sum crosses a threshold called delta, the step runs with eight bit activations and the counter resets. Otherwise it runs at four bits. Early steps change fast and get mostly eight bits, later steps drift slowly and get mostly four, averaging about six bits. The signal is cheap, and it appears again in TeaCache."},
+  {"target": "dvd-quant-fig-13", "title": "Does it work?",
+   "text": "At W four A four, where every baseline visibly breaks, DVD-Quant loses only about three Imaging Quality points against full precision. Min max collapses completely, and even ViDiT-Q falls far behind. With the six bit mixed setting, quality lands almost on top of the original. Two caveats. The mixed schedule beats fixed schedules by less than one point. And the speed-ups come from the authors' own low bit GPU kernels, which Intel hardware cannot run."},
+  {"target": "dvd-quant-callout-01", "title": "What the thesis takes from it",
+   "text": "So what goes into the thesis? Take BGR. It produces an ordinary int4 grid, one scale and zero point per row, which OpenVINO already decompresses. Compute it in PyTorch, extend it to NNCF style groups of sixty-four or one hundred twenty-eight, and compare it with NNCF's data-aware options, with no calibration hours spent. ARQ needs kernels OpenVINO lacks, so treat it as an idea. Next, QVGen asks what happens when training is allowed to recover four bit quality."}
+ ]
+}

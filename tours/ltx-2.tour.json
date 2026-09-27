@@ -1,0 +1,22 @@
+{
+ "paper": "ltx-2",
+ "title": "LTX-2 in five minutes",
+ "stops": [
+  {"target": "ltx-2-paper-01", "title": "The question",
+   "text": "Now we meet the model this thesis actually compresses. LTX-2 from Lightricks asks whether one open model can make a video and its soundtrack together from a single text prompt, with lips, footsteps and music landing at the right moment. LTX-2.3, the thesis model, belongs to this family. So this tour reads the paper like a map. Where do the weights sit, and where does the compute go? Those two answers show what to quantize first."},
+  {"target": "ltx-2-fig-02", "title": "Why generate jointly",
+   "text": "Here is the core idea. The usual approach is a pipeline: one model makes the video, then a second model adds sound to it. But the second model can never change the first, so lip-sync and sound effects suffer. Lip motion depends on the speech, and echo depends on the scene. LTX-2 instead runs an audio stream and a video stream side by side, and lets information flow in both directions. It models video and audio as one joint output."},
+  {"target": "ltx-2-fig-04", "title": "Why it is hard for the thesis",
+   "text": "That design comes at a price, and this is where the thesis begins. The transformer alone has 19 billion parameters, 14 billion for video and 5 billion for audio, and the Gemma-3 text encoder adds another 12 billion. These bars are the atlas's own estimates, parameters times bytes, not numbers from the paper. In sixteen bit, the transformer needs about 38 gigabytes, far more than a sixteen gigabyte Arc card. Only weight-only int4 brings both big blocks under that line."},
+  {"target": "ltx-2-fig-05", "title": "Where the time goes",
+   "text": "Memory is one side. Time is the other. This figure counts how often each part runs for one clip. Gemma, the connectors, the video decoder and the vocoder each run once. The transformer runs at every denoising step, and with the paper's guidance settings it runs up to three times per step, once with full conditioning, once without text and once without the other modality. High resolution refinement adds more calls per tile. So speeding up the transformer is where latency is won."},
+  {"target": "ltx-2-fig-10", "title": "Inside one block",
+   "text": "So now open up the transformer. Every block runs the same four steps in both streams. Self-attention inside the stream, then cross-attention to the text, then audio-visual cross-attention where the two streams exchange information, and finally a feed-forward network. Notice that both streams have the same depth, but the audio stream is narrower. Audio carries less information than video, so the paper gives it fewer parameters. This asymmetry is a big part of why the model is fast."},
+  {"target": "ltx-2-fig-11", "title": "The link between streams",
+   "text": "This is the piece that makes sound and picture line up. Video queries attend to audio keys and values, and audio queries attend to video. The rotary position encoding here uses time only, so the link aligns the streams in time, not in space. Each output is also scaled and gated by timestep signals. For the thesis, the lesson is practical. These small modulation and gate layers are sensitive to precision, so they are good candidates to leave in sixteen bit."},
+  {"target": "ltx-2-fig-18", "title": "Does it work?",
+   "text": "On speed, the headline result is this chart. On an H100, at 720p with 121 frames and guidance off, LTX-2 takes 1.22 seconds per denoising step, against 22.3 seconds for Wan 2.2. That is about eighteen times faster, while also making audio. The paper credits its compact latent space and the asymmetric design. The caveat is quality: the paper gives only human preferences and leaderboard rankings, no numeric scores. So the thesis needs its own metric, such as VBench, to measure what compression costs."},
+  {"target": "ltx-2-callout-01", "title": "What the thesis takes from it",
+   "text": "So here is the plan. Compress the 19 billion parameter transformer first, with NNCF weight-only int8 or int4, and if a data-aware method is used, calibrate on activations from several noise levels. Compress Gemma second, mainly to save memory, and check the feature extractor output. Keep the decoders, vocoder, connectors and modulation layers in sixteen bit. And count parameters in the actual export, because the paper describes LTX-2, not 2.3. Next, GPTQ gives the first real tool for weight-only int4."}
+ ]
+}

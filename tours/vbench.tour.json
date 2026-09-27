@@ -1,0 +1,22 @@
+{
+ "paper": "vbench",
+ "title": "VBench in five minutes",
+ "stops": [
+  {"target": "vbench-paper-01", "title": "The question",
+   "text": "We finish with the only paper in the atlas that is not about making a model or making it cheaper. VBench asks how to tell whether a generated video is good, and good in what way. That matters here because every speedup in the thesis is only worth something if the videos still look right. So think of VBench as the ruler. It is how the study will show that a quantized LTX-2.3 still makes good video."},
+  {"target": "vbench-fig-01", "title": "One score becomes sixteen",
+   "text": "Here is the core idea. Older metrics like FVD squeeze everything into one number. That number cannot tell why a model is bad, and it often disagrees with what people see. VBench replaces it with sixteen separate scores. Each one has its own small prompt set and its own off-the-shelf judge network. And each score is checked against human votes, which is what lets it stand in for a person watching the videos."},
+  {"target": "vbench-fig-02", "title": "Why one number hides things",
+   "text": "Why not just average everything? This figure shows the trap. LaVie beats VideoCrafter on background consistency and flicker, but its dynamic degree is about 50 percent against almost 90. It is smoother partly because it moves less. Now push that to the extreme: a frozen clip would score almost perfectly on consistency and flicker. So VBench adds dynamic degree as a counterweight, and never reports a single averaged number."},
+  {"target": "vbench-fig-03", "title": "The dimension tree",
+   "text": "This tree is the whole benchmark. The teal branches are video quality, seven dimensions that ignore the prompt and ask whether the video looks good and moves well. The gold branches are video condition consistency, nine dimensions that ask whether the video shows what the text asked for, like the right objects, colours, actions and style. Notice the small labels. Each leaf names its judge, for example DINO for subject consistency and RAFT optical flow for motion."},
+  {"target": "vbench-steps-01", "title": "How a score is made",
+   "text": "The recipe is short. First, write about a hundred prompts per dimension, each probing just one ability. Second, generate one video per prompt from every model with a fixed seed. Third, score each video with that dimension's judge and average into a model score. To make raw percentages readable, the paper anchors them with an empirical minimum, an empirical maximum, and the average of real WebVid clips. Finally, humans confirm the ranking."},
+  {"target": "vbench-fig-24", "title": "No model wins everywhere",
+   "text": "This radar chart is the headline result for four open video models. Each axis is one dimension, rescaled so the best model sits at the outer ring. No model wins everywhere. LaVie is broad and strong on most axes. VideoCrafter spikes on dynamic degree and spatial relationships. CogVideo wins subject consistency and motion smoothness but is weak on semantics. That is exactly the kind of diagnosis a single score could never give."},
+  {"target": "vbench-fig-27", "title": "Do the judges agree with people?",
+   "text": "Of course, all of this only counts if the judges agree with people. In this figure each dot is one model, with the human win ratio across and the VBench win ratio up. The Spearman correlation is high in every dimension, from about 0.61 for colour up to 0.998 for motion smoothness. Two caveats matter. Only four models were compared, and the weakest dimensions, like colour and object class, deserve less weight. Also, VBench does not judge audio at all."},
+  {"target": "vbench-callout-01", "title": "What the thesis takes from it",
+   "text": "For the thesis, VBench works as a before and after test, not a leaderboard. The plan picks six to eight dimensions that compression can break: imaging quality, aesthetics, flicker and consistency for quantization, motion smoothness and dynamic degree for step caching, plus one semantic check. The full-precision and quantized models run on the same prompts and seeds, and the differences are reported. Dynamic degree always sits next to consistency. And that closes the atlas: the models give the video, quantization and caching make it fast on Intel hardware, and VBench proves the fast version is still good."}
+ ]
+}

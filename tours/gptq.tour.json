@@ -1,0 +1,24 @@
+{
+ "paper": "gptq",
+ "title": "GPTQ in five minutes",
+ "stops": [
+  {"target": "gptq-paper-01", "title": "The question",
+   "text": "We have seen what LTX models are. Now let's learn how to shrink one, starting with the paper that founded modern weight quantization. GPTQ asks whether a huge trained language model can have its weights squeezed to three or four bits, in a few GPU hours, with no retraining and almost no loss in quality. That matters directly for the thesis, because the int4 weight compression in NNCF, the tool used on LTX-2.3, builds on this exact idea."},
+  {"target": "gptq-fig-01", "title": "Round, then compensate",
+   "text": "This one picture is the whole paper. On the left, round to nearest rounds every weight on its own and simply throws the rounding error away. On the right, GPTQ rounds one column, then nudges all the columns that are still in full precision so they absorb that error. The goal is not to keep each weight close to its original value, but to keep the layer's output close. Everything that follows makes this accurate and fast."},
+  {"target": "gptq-fig-02", "title": "Plain rounding collapses",
+   "text": "Why bother? Look at the biggest OPT model, with one hundred seventy-five billion parameters. Plain rounding at four bits already costs about 2.2 points of perplexity, and at three bits the model is destroyed, with a perplexity in the thousands. GPTQ stays within 0.03 points at four bits and 0.34 at three. So plain rounding is shaky at four bits and fails below that. That gap is the problem."},
+  {"target": "gptq-fig-03", "title": "Accurate but far too slow",
+   "text": "An accurate method already existed, called Optimal Brain Quantization. It uses second-order information, the Hessian of the layer's error, to decide how to compensate. The catch is cost: it grows with the number of rows times the number of columns cubed. For one layer of the largest model that is hopeless. The bars here are illustrative counts, not measurements, but GPTQ needs thousands of times fewer operations. So the real contribution is making this idea scale."},
+  {"target": "gptq-fig-06", "title": "Push the error forward",
+   "text": "Here is the core loop. Notice first that every row is quantized in the same left-to-right column order. The paper finds this works about as well as a clever greedy order, and it means all rows share one inverse Hessian, built only from calibration inputs. At each step one column is rounded, and its error, scaled by a row of that inverse Hessian, is subtracted from the columns to its right. Frozen columns never change again."},
+  {"target": "gptq-fig-07", "title": "Make it GPU friendly",
+   "text": "Two more tricks make this practical. First, updating the whole matrix after every column wastes time moving memory. So GPTQ keeps updates inside a block of one hundred twenty-eight columns, then applies one large matrix multiply to the rest. Same arithmetic, about ten times faster. Second, on big models round-off errors pile up in the inverse Hessian, so GPTQ computes everything it needs up front with one stable Cholesky factorization and a little dampening."},
+  {"target": "gptq-fig-14", "title": "Does it work?",
+   "text": "It does. The whole one hundred seventy-five billion parameter model is quantized in about four hours on a single GPU. This chart shows the quality trade-off on the largest models, with full precision as the dashed line. The trick is grouping: giving every block of, say, one hundred twenty-eight weights its own scale. Three bits with groups of one hundred twenty-eight lands within about 0.1 to 0.15 points of full precision, and even two bits with small groups stays usable."},
+  {"target": "gptq-fig-15", "title": "The speed caveat",
+   "text": "Now the caveat that matters most for the thesis. GPTQ reports token generation up to about 4.5 times faster, but only because a language model at batch size one is memory-bound: it mostly waits for weights to arrive. Smaller weights mean less waiting. A video diffusion transformer processes thousands of tokens per step, so it is mostly compute-bound. For LTX-2.3, expect int4 weights to save memory first, and measure any speed-up rather than assume it."},
+  {"target": "gptq-callout-01", "title": "What the thesis takes from it",
+   "text": "So what does the thesis take from GPTQ? There is no need to implement it. Switch on the GPTQ option in NNCF's int4 weight compression with group size one hundred twenty-eight. Feed it calibration inputs collected across prompts, across early and late denoising steps, and for both the video and audio streams. Keep sensitive layers in int8, and compare plain rounding, GPTQ and AWQ as an ablation. Next, SmoothQuant tackles what GPTQ leaves alone: the activations."}
+ ]
+}

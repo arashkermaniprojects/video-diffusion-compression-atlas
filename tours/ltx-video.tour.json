@@ -1,0 +1,20 @@
+{
+ "paper": "ltx-video",
+ "title": "LTX-Video in five minutes",
+ "stops": [
+  {"target": "ltx-video-paper-01", "title": "The question",
+   "text": "Welcome to the atlas. These sixteen papers tell one story: what LTX-2.3 is, and how to make it smaller and faster on Intel hardware without ruining the videos. We start with LTX-Video, the ancestor of the model this thesis compresses. Its question is bold: can a video diffusion model generate faster than real time? Their answer is yes. Five seconds of video in about two seconds on an H100, with fewer than two billion parameters. Let's see how."},
+  {"target": "ltx-video-fig-01", "title": "The whole idea",
+   "text": "Here is the whole paper in one picture. The top row is a typical video pipeline, the bottom row is LTX-Video. Two moves make the difference. First, the autoencoder takes over the job of cutting the video into patches, so each token stands for a block of 32 by 32 pixels over 8 frames. Second, the decoder does the final denoising step. For a five second clip that means about six thousand tokens instead of about forty seven thousand, and roughly sixty times less attention work."},
+  {"target": "ltx-video-fig-03", "title": "Why it's hard",
+   "text": "So why doesn't everyone compress this hard? Because heavy compression breaks the decoder. With a finite number of denoising steps, the latent never becomes perfectly clean. A normal decoder only ever saw clean latents in training, so the leftover noise turns into visible artifacts, and the harder the compression, the worse it gets. Other systems patch this with large upsampling networks, which cost a lot of runtime. LTX-Video needed a cheaper fix."},
+  {"target": "ltx-video-fig-06", "title": "Let the decoder finish",
+   "text": "That fix is this diagram. The transformer runs all but the last step in latent space. Each box is one Euler step that moves the latent along a predicted velocity, while the noise level drops from one towards a small value. Then the decoder, trained as a small denoiser, takes that slightly noisy latent and outputs clean pixels directly. Notice where the work sits: in the transformer boxes, repeated at every step. That is where the compute and the quantization error will accumulate."},
+  {"target": "ltx-video-fig-09", "title": "Dense latent channels",
+   "text": "One more piece matters for the thesis. Each latent token has 128 channels, and this figure shows that training makes them all carry separate information. Early on, a few directions explain almost all the variance, so the channels are redundant. By the end, the variance is spread almost evenly, and the correlations between channels fade to near zero. The curves here are redrawn, so read the shape, not exact values. The message is simple: very little redundancy, and so very little room to hide errors."},
+  {"target": "ltx-video-fig-26", "title": "Does it work?",
+   "text": "Does speed cost quality? This chart turns the human study into bars. Twenty raters compared videos from a thousand prompts per task, and LTX-Video wins 85 percent of its pairwise tests for text to video and 91 percent for image to video, well above Open-Sora Plan, CogVideoX and PyramidFlow. It is also the fastest model in the comparison. The caveat is that this is a human preference study against small open models, not a full benchmark suite, and every speed number is measured on an H100."},
+  {"target": "ltx-video-callout-01", "title": "What the thesis takes from it",
+   "text": "So what does the thesis take from this paper? First, the compute lives in the transformer's linear layers, and with only a few thousand tokens the model is close to weight bandwidth bound on a CPU or Arc GPU. That is exactly where NNCF weight-only int8 or int4 compression pays off. Second, the dense latent means errors are not averaged away, so judge quality with video metrics over time, calibrate across all timesteps, and keep the decoder at higher precision at first. Next, LTX-2 shows how this design grows to add audio."}
+ ]
+}

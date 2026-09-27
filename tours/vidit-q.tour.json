@@ -1,0 +1,22 @@
+{
+ "paper": "vidit-q",
+ "title": "ViDiT-Q in five minutes",
+ "stops": [
+  {"target": "vidit-q-paper-01", "title": "The question",
+   "text": "Let's start with the paper that matters most for this thesis. ViDiT-Q asks a simple question. Quantization tricks that work well for language models and image generators seem to fall apart on video diffusion transformers. Why, and can we fix it without retraining? That is exactly the situation with LTX-2.3: a large video transformer that needs to shrink. So as we go, the question to keep in mind is which parts of this paper can be reused on Intel hardware."},
+  {"target": "vidit-q-fig-08", "title": "What goes wrong",
+   "text": "Here is the motivation in one figure. With existing quantizers, eight bit weights and activations already shift the colours and blur the video, and at four bit weights the output turns into noise. ViDiT-Q keeps the frames looking like the full-precision model at both settings. On the right is the promise: about two times less memory and up to 1.7 times lower latency on a GPU. The rest of the paper explains how they get there."},
+  {"target": "vidit-q-fig-03", "title": "Why video is hard",
+   "text": "The core diagnosis is this cube. When a tensor is quantized, a group of numbers shares one scale. But in a video diffusion transformer the activations change along four directions at once: from token to token, between the two guidance passes, across denoising timesteps, and in a few outlier channels whose strength drifts over time. A single static scale has to cover all of that, so it becomes far too wide, and most values get rounded coarsely. Every fix in the paper answers one of these four axes."},
+  {"target": "vidit-q-fig-04", "title": "Fix one: scale each token",
+   "text": "The first fix handles tokens, guidance passes and timesteps in one move. Activations get their own scale per token, computed on the fly from that token's minimum and maximum. Because the scale is measured live, it follows every timestep automatically, with no calibration table. Notice the constraint in the drawing: groups must run along the summation axis of the matrix multiply, otherwise fast integer kernels cannot use them. That is a hardware lesson that returns with OpenVINO."},
+  {"target": "vidit-q-fig-06", "title": "Fix two: balance the channels",
+   "text": "The second fix targets outlier channels. Part of the imbalance is fixed, and a SmoothQuant style scale handles it. Part moves with the timestep, and a rotation spreads it out. This chart shows why both are needed. The measure is roughly the largest weight divided by the average one. It starts at about forty. Scaling alone gets it to about eighteen, rotation alone to about thirteen. Together they reach five, which is small enough for four bits."},
+  {"target": "vidit-q-fig-07", "title": "Fix three: judge layers by the right metric",
+   "text": "This is the part most worth reusing. Some layers are more sensitive than others, so ViDiT-Q gives them more bits. The key idea is how sensitivity is measured. Cross-attention layers mainly affect whether the video matches the text, so they are scored with a text alignment metric. Spatial attention and feed-forward layers affect visual quality. Temporal attention affects motion. Each group is judged only by its own metric, and the bit budget is shared out inside the group."},
+  {"target": "vidit-q-fig-29", "title": "Does it work?",
+   "text": "The ablation shows what each piece buys. Plain static quantization collapses. Switching to per-token dynamic scales rescues the model, and channel balancing gives the largest single gain. Now look at the dip: choosing bit-widths by mean squared error actually makes things worse. Only the metric-matched search improves on uniform four bit weights. The lesson is that a numerical error measure is not a good proxy for how a generated video looks."},
+  {"target": "vidit-q-callout-01", "title": "What the thesis takes from it",
+   "text": "So what does the thesis take from it? Not the CUDA kernels, since OpenVINO cannot use them. Take the sensitivity method. Group LTX-2.3's linear layers by role, including the audio branch and the audio video cross-attention. Quantize them one at a time to int4, score each group with its own metric, and keep the most sensitive layers at int8 while NNCF compresses the rest. Next, SVDQuant shows another way to handle outliers, by giving them a small high-precision branch of their own."}
+ ]
+}

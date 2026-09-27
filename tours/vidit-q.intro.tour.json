@@ -1,0 +1,33 @@
+{
+ "paper": "vidit-q",
+ "kind": "intro",
+ "button": "Play intro",
+ "title": "Before reading ViDiT-Q",
+ "stops": [
+  {
+   "target": "vidit-q-paper-01",
+   "title": "What comes first",
+   "text": "ViDiT-Q is about shrinking video diffusion transformers to eight and four bits without retraining them, and still getting videos that look like the original. That is very close to the goal of the LTX-2.3 study. Before the details, two things need to be clear: what rounding to a few bits does to a number, and what happens inside one step of a video transformer. Let's build both."
+  },
+  {
+   "target": "vidit-q-ifig-01",
+   "title": "Rounding to a grid",
+   "text": "Quantizing means snapping every number to one of a few levels. The spacing of those levels comes from the smallest and largest value in the group. Now look at the lower line: one magenta outlier stretches the range, and all the ordinary values are squeezed into about four levels. With eight bits there are two hundred fifty six levels, with four bits only sixteen. So outliers hurt much more at four bits."
+  },
+  {
+   "target": "vidit-q-ifig-03",
+   "title": "Inside a video transformer",
+   "text": "Here is why video is tricky. The model removes noise over about twenty timesteps, and every frame is cut into patches that become tokens. Each block has spatial attention, temporal attention, cross attention to the text, and a feed forward network. The timestep changes every block through adaptive layer norm, and classifier free guidance runs each step twice, with and without the prompt. So the same layer sees very different numbers from one run to the next."
+  },
+  {
+   "target": "vidit-q-gloss-01",
+   "title": "Words to know",
+   "text": "A few terms from this list will come up again and again. Static quantization fixes the scales in advance, while dynamic quantization measures them live, and ViDiT-Q uses a dynamic scale for every token. Channel balancing moves outliers around so all channels have similar ranges. And incoherence is the paper's measure of how spiky a weight is, roughly the largest value divided by the average one."
+  },
+  {
+   "target": "vidit-q-ifig-04",
+   "title": "Where this paper sits",
+   "text": "Finally, where does this fit? Q-Diffusion and PTQ4DiT handled image models. ViDiT-Q is the first to tackle video transformers, and it adds three pieces: per token dynamic scales, a two step channel balancing, and a mixed precision search that judges each layer by the quality it actually affects. That last piece is what the thesis reuses with NNCF. The guided tour, one button to the right, takes it from here."
+  }
+ ]
+}

@@ -1,0 +1,33 @@
+{
+ "paper": "q-diffusion",
+ "kind": "intro",
+ "button": "Play intro",
+ "title": "Before reading Q-Diffusion",
+ "stops": [
+  {
+   "target": "q-diffusion-paper-01",
+   "title": "What this paper is about",
+   "text": "Before we open Q-Diffusion, let's make sure the ground is solid. This paper asks how to quantize a diffusion model after training, with no retraining at all. To follow it, three ideas are needed: how a diffusion model generates, what calibration does in quantization, and what a U-Net skip connection is. We will walk through the first two now; the U-Net picture is on the page."
+  },
+  {
+   "target": "q-diffusion-ifig-01",
+   "title": "One network, many steps",
+   "text": "Start here. A diffusion model begins with pure noise and runs the same network many times, removing a little noise at each step until an image appears. Each step feeds on the previous step's output. Now look at the gold bars. The range of the network's input shrinks steadily as the image forms. So a quantizer tuned on one step will be wrong for the others. Keep that in mind, because it is the first problem the paper solves."
+  },
+  {
+   "target": "q-diffusion-ifig-02",
+   "title": "Calibration and W4A8",
+   "text": "Next, calibration. Before quantizing, a few example inputs are run through the model, record the range of each tensor, and turn it into a step size. W four A eight means four bit weights, with only sixteen levels, and eight bit activations, with two hundred and fifty six. If the examples give the wrong range, small values simply round to zero. So choosing the calibration inputs well matters a lot, and that is exactly what NNCF will ask for."
+  },
+  {
+   "target": "q-diffusion-gloss-01",
+   "title": "A few words to know",
+   "text": "Two more things before the map. The paper tests on a small U-Net for tiny images, on latent diffusion models, and on Stable Diffusion, which is text to image. Quality is measured mostly by FID, which compares generated images with real ones, and lower is better. For Stable Diffusion they also report CLIP score, which checks that the image matches the prompt. And notice that they report model size and bit operations, not measured speed."
+  },
+  {
+   "target": "q-diffusion-ifig-04",
+   "title": "Where this paper sits",
+   "text": "Finally, where this fits. The three papers before it quantize language models, which have no denoising steps. Q-Diffusion is the first diffusion paper in the atlas, and it adds step-aware calibration and a split quantizer for skip connections. The next paper, PTQ4DiT, brings these ideas to diffusion transformers like LTX-2.3. The calibration recipe is the part the thesis reuses directly. The guided tour, one button to the right, takes it from here."
+  }
+ ]
+}

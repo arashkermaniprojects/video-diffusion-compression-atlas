@@ -1,0 +1,33 @@
+{
+ "paper": "ptq4dit",
+ "kind": "intro",
+ "button": "Play intro",
+ "title": "Before reading PTQ4DiT",
+ "stops": [
+  {
+   "target": "ptq4dit-paper-01",
+   "title": "What this paper is about",
+   "text": "PTQ4DiT is the first paper that quantizes a diffusion transformer, the same family of model as LTX-2.3, without any retraining. Its main result is image quality close to full precision with four bit weights and eight bit activations. Before reading it, three small ideas help: what happens inside a transformer block of a diffusion model, why one loud channel ruins a low bit grid, and what a rank correlation is. Let's go through them."
+  },
+  {
+   "target": "ptq4dit-ifig-01",
+   "title": "Inside a DiT block",
+   "text": "Here is one block. The timestep and the class label go into a small network that produces a scale and a shift for every channel. Adaptive layer norm applies them to the tokens, and the result, which the paper calls X, flows into the linear layer that gets quantized. Keep this path in mind, because the paper later folds its activation scaling into that small network, so the trick costs nothing when the model runs."
+  },
+  {
+   "target": "ptq4dit-ifig-02",
+   "title": "One loud channel",
+   "text": "Now the core problem. A four bit quantizer has sixteen levels, stretched to cover the biggest value. If one channel reaches twelve while the rest stay near one, the ordinary values land on about two levels, and the image falls apart. The paper calls these loud channels salient. W four A eight simply means four bit weights and eight bit activations. The key observation is that loud activation channels and loud weight channels are usually different ones."
+  },
+  {
+   "target": "ptq4dit-gloss-01",
+   "title": "Words to know",
+   "text": "A few words from this list will come up again and again. Salience is just the largest value in a channel. Spearman's rho, drawn in the ranking figure above, asks whether two lists put the same channels at the top. If loud activation and weight channels coincide, rho is high and balancing cannot help, so the paper trusts those timesteps less. And for results, FID is lower is better, while the Inception Score is higher is better."
+  },
+  {
+   "target": "ptq4dit-ifig-04",
+   "title": "Where it sits",
+   "text": "Finally, the map. Just before this came Q-Diffusion, which calibrated U-Nets across timesteps. PTQ4DiT takes the SmoothQuant idea of moving magnitude between activations and weights, and makes it work on diffusion transformers. Next comes ViDiT-Q, which faces video and needs stronger tools. The guided tour, one button to the right, takes it from here."
+  }
+ ]
+}

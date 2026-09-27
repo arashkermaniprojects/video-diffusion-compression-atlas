@@ -1,0 +1,22 @@
+{
+ "paper": "ptq4dit",
+ "title": "PTQ4DiT in five minutes",
+ "stops": [
+  {"target": "ptq4dit-paper-01", "title": "The question",
+   "text": "Q-Diffusion showed that diffusion models can be quantized, but it was built for the older U-Net models. PTQ4DiT asks what changes when the denoiser is a transformer, like the DiT image model here, or LTX-2.3 in this thesis. The goal is post-training quantization, so no retraining, at W eight A eight and at the harder W four A eight, meaning four bit weights and eight bit activations. On ImageNet, the four bit version shrinks the model from about 2.6 gigabytes to about 320 megabytes."},
+  {"target": "ptq4dit-fig-01", "title": "The core idea",
+   "text": "Here is the whole paper in one picture. In each linear layer, a few input channels carry huge values. The authors call them salient channels. The key observation is that activation outliers and weight outliers almost never sit in the same channel. So when an activation channel is loud, it can be shrunk and the matching weight row grown by the same factor. Both tensors end up at the geometric mean of their two ranges, and the product stays exactly the same."},
+  {"target": "ptq4dit-fig-02", "title": "Why it's hard",
+   "text": "Why bother? This block shows the two ways plain quantization breaks. On the left, a uniform grid has to stretch to cover one salient channel, so at four bits only about two levels are left for the bulk of the values. On the right is the diffusion twist. The salient activations grow toward the end of sampling, so a range calibrated at one timestep clips the late steps and wastes resolution early. One fix per problem is coming."},
+  {"target": "ptq4dit-fig-03", "title": "Balance, then calibrate",
+   "text": "The left side is the first fix, called channel-wise salience balancing. Take one channel whose activation maximum is twelve and whose weight maximum is one. Both move to their geometric mean, about 3.5, so the worst value drops from twelve to 3.5. The right side is the second fix. Instead of trusting a single timestep, the activation statistics are averaged over many timesteps. Steps where activation and weight outliers are least correlated, where the trade works best, get more weight, using Spearman's rank correlation."},
+  {"target": "ptq4dit-fig-04", "title": "Zero cost at inference",
+   "text": "Now the engineering part, which matters a lot for this project. None of these scales run at inference time. The weight scale is multiplied into the linear weight once, offline. The activation scale is pushed into the small network that produces the adaptive layer norm scale and shift, or into the layer just before. After that, the quantized model runs ordinary integer matrix multiplies with no new operations. That is exactly the kind of change OpenVINO can execute without custom kernels."},
+  {"target": "ptq4dit-fig-18", "title": "Does it work?",
+   "text": "So does it work? This chart is W four A eight at 256 pixels. The horizontal axis is sampling steps and the vertical axis is FID, where lower is better. PTQ4DiT reaches an FID of 7.09 at 250 steps, close to the dashed full-precision line, while Q-Diffusion sits at about fifteen and other baselines go far higher. The caveat is resolution. At 512 pixels it still beats every baseline by about three times, but a clear gap to full precision remains."},
+  {"target": "ptq4dit-fig-20", "title": "Which half matters",
+   "text": "The ablation shows where effort pays off. The plain quantizer scores an FID of 22.54. Adding channel balancing alone, with statistics from just the middle timestep, drops it to 8.17. The timestep-aware calibration then takes it to 7.09. So balancing does most of the work, and choosing the calibration timesteps well adds a smaller but consistent final gain."},
+  {"target": "ptq4dit-callout-01", "title": "What the thesis takes from it",
+   "text": "What goes into the thesis? The balancing half is simply SmoothQuant with alpha set to one half, and NNCF already implements SmoothQuant for OpenVINO. So for an eight bit weights and activations track on LTX-2.3, set the alpha to about 0.5 and check which layers get smoothed. The timestep half becomes a calibration-set decision: collect transformer inputs from ten to twenty-five denoising steps. Remember this paper covers images only. Next, ViDiT-Q takes the same questions to video transformers, which is much closer to LTX-2.3."}
+ ]
+}

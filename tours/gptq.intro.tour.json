@@ -1,0 +1,33 @@
+{
+ "paper": "gptq",
+ "kind": "intro",
+ "button": "Play intro",
+ "title": "Before reading GPTQ",
+ "stops": [
+  {
+   "target": "gptq-paper-01",
+   "title": "What GPTQ is about",
+   "text": "Before the guided tour, it helps to cover the basics. GPTQ takes a huge trained language model and squeezes its weights down to four or even three bits in a few GPU hours, without retraining. The trick is that each rounding error gets pushed onto weights that are not yet rounded. To follow it, three ideas are needed: what a four bit weight is, what the Hessian means here, and why fewer bits make generation faster."
+  },
+  {
+   "target": "gptq-ifig-01",
+   "title": "What four bits means",
+   "text": "Start here. A four bit weight can only take one of sixteen evenly spaced values, and one full precision number, the scale, says how far apart they are. Rounding every weight to its nearest level is called round to nearest, or RTN. It is the baseline the paper keeps beating. Notice the two coloured groups at the bottom: giving each block of one hundred and twenty eight weights its own scale is the group size setting that appears in NNCF."
+  },
+  {
+   "target": "gptq-ifig-02",
+   "title": "Why the Hessian matters",
+   "text": "This is the key idea. Some rounding errors barely change a layer's output, others change it a lot, and which is which depends on the inputs the layer sees. The Hessian, built from a small calibration set, captures that. On the drawing, the nearest grid point is not the best one. GPTQ never searches every point. It rounds one column, then nudges the remaining weights so the output stays close to the original."
+  },
+  {
+   "target": "gptq-gloss-01",
+   "title": "A few words to know",
+   "text": "The glossary can be skimmed, but four words come up constantly. Perplexity measures how well a language model predicts text, and lower is better. The calibration set is just a hundred and twenty eight text snippets the model reads once. OBQ is the slow, accurate method GPTQ speeds up. And the A100 and A6000 are NVIDIA GPUs, so their speed ups are context, not promises for Intel hardware."
+  },
+  {
+   "target": "gptq-ifig-04",
+   "title": "Where GPTQ sits",
+   "text": "Finally, the map. The previous tab covered LTX-2, the model this thesis compresses. GPTQ opens the quantization part of the atlas, shrinking weights only, and SmoothQuant comes next to handle activations. Most importantly for the thesis, NNCF's int4 weight compression can run GPTQ directly, so this paper explains a button the project actually presses. When ready, press Play guided tour."
+  }
+ ]
+}

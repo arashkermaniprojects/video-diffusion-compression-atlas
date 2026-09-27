@@ -1,0 +1,33 @@
+{
+ "paper": "teacache",
+ "kind": "intro",
+ "button": "Play intro",
+ "title": "Before reading TeaCache",
+ "stops": [
+  {
+   "target": "teacache-paper-01",
+   "title": "What this paper is about",
+   "text": "TeaCache is about making a video diffusion model faster by not running the transformer at every step. It needs no training at all. Reading it takes three small ideas: how the denoising loop works, how the timestep enters the model, and how to measure how much a tensor changed. Let's go through them one by one, with a picture each."
+  },
+  {
+   "target": "teacache-ifig-01",
+   "title": "One step, one full pass",
+   "text": "A diffusion model starts from pure noise and removes a little of it per step. Every step runs the whole transformer once, and a video model may need thirty to a hundred and fifty steps. That is where the time goes. Now notice the middle of the loop: neighbouring steps produce almost the same result. If we can spot those near duplicates, we can reuse the last result instead of computing it again."
+  },
+  {
+   "target": "teacache-ifig-02",
+   "title": "The signal TeaCache watches",
+   "text": "How do we spot them cheaply? The timestep is turned into a scale and a shift that modulate the video tokens at the start of every block. The output of that first modulation already carries both the content and the noise level, and it costs almost nothing to compute. TeaCache compares it with the previous step, using the relative change from the next primer. When the accumulated change stays small, the step is skipped."
+  },
+  {
+   "target": "teacache-gloss-01",
+   "title": "Words to keep in mind",
+   "text": "A few terms from this list will come up again and again. The threshold delta sets how much change is tolerated before the model runs again: point one is the careful setting, point two the fast one. VBench scores a video on its own, while PSNR, SSIM and LPIPS measure how close it stays to the uncached video. And every timing in the paper comes from an NVIDIA A800, a data-centre GPU much faster than the Intel machine in this project, so compare speed-up ratios, not seconds."
+  },
+  {
+   "target": "teacache-ifig-04",
+   "title": "Where this paper sits",
+   "text": "Finally, where does this sit? The quantization papers made each pass cheaper. FlashAttention-2 and DeepCache sped things up inside a pass or inside a U-Net. TeaCache skips whole passes of a transformer, which is exactly the kind of model LTX-2.3 is. Because it is independent of int8 or int4 weights, the two can be combined on LTX-2.3. The guided tour, one button to the right, takes it from here."
+  }
+ ]
+}

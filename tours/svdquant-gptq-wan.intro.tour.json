@@ -1,0 +1,33 @@
+{
+ "paper": "svdquant-gptq-wan",
+ "kind": "intro",
+ "button": "Play intro",
+ "title": "Before reading SVDQuant-GPTQ for Wan2.2",
+ "stops": [
+  {
+   "target": "svdquant-gptq-wan-paper-01",
+   "title": "What this paper does",
+   "text": "Before we open this paper, here is why it matters. It takes Wan two point two, a very large image to video model, and squeezes both its weights and its activations down to four bits, without any retraining. That is the closest thing in the literature to the LTX-2.3 project. Following it takes three ideas first: how the model's two experts share the work, what a four bit block format looks like, and why smaller does not mean faster."
+  },
+  {
+   "target": "svdquant-gptq-wan-ifig-01",
+   "title": "Two experts, one timeline",
+   "text": "Here is the first idea. Wan two point two has two denoisers. The high-noise expert handles the early steps, where the layout and motion are set, and then hands over to the low-noise expert, which polishes texture and detail. Only one of them runs at a time. Because they see very different inputs, their numbers behave differently, and the paper calibrates each expert separately. Remember that the low-noise expert turns out to be the fragile one."
+  },
+  {
+   "target": "svdquant-gptq-wan-ifig-02",
+   "title": "Four bits in blocks",
+   "text": "The second idea is the format. W four A four means weights and activations both in four bits. In MXFP4, every block of thirty two numbers shares one scale, and each number has only sixteen possible values. Now look at the magenta cell. One large outlier forces a big scale, and all its neighbours get squashed onto a few codes near zero. Everything clever in this paper is about stopping that from happening."
+  },
+  {
+   "target": "svdquant-gptq-wan-gloss-01",
+   "title": "Words to keep in mind",
+   "text": "From the glossary, keep two terms in mind. A timestep bin is a small group of denoising steps that share one activation scale, so the scale can follow the model as it moves from noise to a clean video. And pseudo-quantization means storing four bit numbers but converting them back to sixteen bits before the math. That is why this paper saves memory but gets slower, which the third primer explains."
+  },
+  {
+   "target": "svdquant-gptq-wan-ifig-04",
+   "title": "Where it sits",
+   "text": "Finally, the map. This paper closes the diffusion quantization group. It reuses two tools already met in the atlas, GPTQ and SVDQuant, and adds clipping ratios per timestep bin and per expert. Its missing speed-up points to the next group of papers, which is all about fast kernels. The guided tour, one button to the right, takes it from here."
+  }
+ ]
+}
